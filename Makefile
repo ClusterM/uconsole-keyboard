@@ -39,6 +39,16 @@ C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/stm32f1xx_it.c \
 Core/Src/stm32f1xx_hal_msp.c \
+Core/Src/keyboard.c \
+Core/Src/keys.c \
+Core/Src/keymaps.c \
+Core/Src/trackball.c \
+Core/Src/hid_keyboard.c \
+Core/Src/hid_mouse.c \
+Core/Src/hid_consumer.c \
+Core/Src/ratemeter.c \
+Core/Src/glider.c \
+Core/Src/math_utils.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c \

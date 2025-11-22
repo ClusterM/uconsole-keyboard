@@ -22,7 +22,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "keyboard.h"
+#include "keys.h"
+#include "trackball.h"
+#include "keymaps.h"
+#include "keyboard_state.h"
+#include "hid_keyboard.h"
+#include "hid_mouse.h"
+#include "hid_consumer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -92,17 +99,60 @@ int main(void)
   MX_TIM1_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
-
+  
+  // Initialize keyboard state
+  keyboard_state.layer = 0;
+  keyboard_state.prev_layer = 0;
+  keyboard_state.fn_on = 0;
+  keyboard_state.select_on = 0;
+  keyboard_state.sf_on = 0;
+  keyboard_state.backlight = 0;
+  keyboard_state.lock = 0;
+  
+  keyboard_state.ctrl.lock = 0;
+  keyboard_state.ctrl.time = 0;
+  keyboard_state.ctrl.begin = 0;
+  
+  keyboard_state.shift.lock = 0;
+  keyboard_state.shift.time = 0;
+  keyboard_state.shift.begin = 0;
+  
+  keyboard_state.alt.lock = 0;
+  keyboard_state.alt.time = 0;
+  keyboard_state.alt.begin = 0;
+  
+  keyboard_state.fn.lock = 0;
+  keyboard_state.fn.time = 0;
+  keyboard_state.fn.begin = 0;
+  
+  // Initialize modules
+  keyboard_init();
+  keys_init();
+  trackball_init();
+  
+  // Start PWM for backlight
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
+  
+  // Wait for USB connection
+  HAL_Delay(1000);
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(1000);
+    // Update backlight PWM
+    const uint16_t backlight_vals[3] = {0, 500, 2000};
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, backlight_vals[keyboard_state.backlight]);
+    
+    // Main tasks
+    trackball_task();
+    keys_task();
+    keyboard_task();
+    
+    HAL_Delay(1);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

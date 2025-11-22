@@ -76,3 +76,5 @@ ehthumbs.db
 Thumbs.db
 Desktop.ini
 
+bad_old_project/
+*.pdf

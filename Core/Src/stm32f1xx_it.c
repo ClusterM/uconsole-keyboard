@@ -22,6 +22,7 @@
 #include "stm32f1xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "trackball.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -210,6 +211,31 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
   /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 1 */
 
   /* USER CODE END USB_LP_CAN1_RX0_IRQn 1 */
+}
+
+/**
+  * @brief This function handles EXTI line[9:5] interrupts.
+  */
+void EXTI9_5_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI9_5_IRQn 0 */
+  if (__HAL_GPIO_EXTI_GET_IT(HO_UP_Pin) != RESET) {
+    __HAL_GPIO_EXTI_CLEAR_IT(HO_UP_Pin);
+    trackball_interrupt_y_neg();
+  }
+  if (__HAL_GPIO_EXTI_GET_IT(HO_RIGHT_Pin) != RESET) {
+    __HAL_GPIO_EXTI_CLEAR_IT(HO_RIGHT_Pin);
+    trackball_interrupt_x_pos();
+  }
+  if (__HAL_GPIO_EXTI_GET_IT(HO_DOWN_Pin) != RESET) {
+    __HAL_GPIO_EXTI_CLEAR_IT(HO_DOWN_Pin);
+    trackball_interrupt_y_pos();
+  }
+  if (__HAL_GPIO_EXTI_GET_IT(HO_LEFT_Pin) != RESET) {
+    __HAL_GPIO_EXTI_CLEAR_IT(HO_LEFT_Pin);
+    trackball_interrupt_x_neg();
+  }
+  /* USER CODE END EXTI9_5_IRQn 0 */
 }
 
 /* USER CODE BEGIN 1 */
