@@ -64,7 +64,69 @@ static void MX_TIM1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+/**
+* @brief  Reset USB peripheral completely after bootloader
+* @retval None
+*/
+static void USB_Reset_After_Bootloader(void)
+{
+  // Step 1: Disable USB interrupts
+  HAL_NVIC_DisableIRQ(USB_HP_CAN1_TX_IRQn);
+  HAL_NVIC_DisableIRQ(USB_LP_CAN1_RX0_IRQn);
+  
+  // Step 2: Clear any pending USB interrupts
+  NVIC_ClearPendingIRQ(USB_HP_CAN1_TX_IRQn);
+  NVIC_ClearPendingIRQ(USB_LP_CAN1_RX0_IRQn);
+  
+  // Step 3: Enable USB clock to access registers
+  __HAL_RCC_USB_CLK_ENABLE();
+  
+  // Step 4: Force USB reset and clear all registers
+  USB->CNTR = (uint16_t)USB_CNTR_FRES;
+  HAL_Delay(1);
+  USB->CNTR = 0U;
+  USB->ISTR = 0U;
+  USB->DADDR = 0U;
+  USB->BTABLE = 0U;
+  
+  // Step 5: Disable USB clock
+  __HAL_RCC_USB_CLK_DISABLE();
+  
+  // Step 6: Reset USB peripheral through RCC (hardware reset)
+  __HAL_RCC_USB_FORCE_RESET();
+  HAL_Delay(10);
+  __HAL_RCC_USB_RELEASE_RESET();
+  HAL_Delay(10);
+  
+  // Step 7: Force USB disconnect by pulling DP (PA12) low
+  // This simulates physical disconnection
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  
+  // Configure PA12 (USB_DP) as output
+  GPIO_InitStruct.Pin = GPIO_PIN_12;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  
+  // Pull DP low to force disconnect
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+  
+  // Wait longer for host to detect disconnect (USB spec requires at least 2.5us, we use 200ms)
+  // This gives Windows enough time to fully release the device and clear its cache
+  HAL_Delay(200);
+  
+  // Step 8: Release GPIO and restore to default state
+  HAL_GPIO_DeInit(GPIOA, GPIO_PIN_12);
+  
+  // Step 9: Additional delay before reinitialization to ensure host has fully processed disconnect
+  HAL_Delay(100);
+  
+  // Step 10: Ensure USB pins are in correct state for reinitialization
+  // PA11 (USB_DM) and PA12 (USB_DP) should be in analog mode for USB
+  // On STM32F1, USB pins don't need explicit configuration, but we ensure clean state
+  // The pins will be configured by USB peripheral when it's enabled
+}
 /* USER CODE END 0 */
 
 /**
@@ -91,7 +153,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  USB_Reset_After_Bootloader();
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -179,7 +241,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -194,12 +256,12 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
-  PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL;
+  PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
