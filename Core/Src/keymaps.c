@@ -87,6 +87,19 @@ static uint16_t keys_pick_map[KEYS_NUM] = {0};
 
 const uint16_t backlight_vals[3] = {0, 500, 2000};
 
+/**
+  * @brief  Reset to bootloader via watchdog
+  * @retval None (never returns)
+  */
+static void jump_to_bootloader(void)
+{
+    IWDG->KR = 0x5555;
+    IWDG->PR = 0;
+    IWDG->RLR = 1;
+    IWDG->KR = 0xCCCC;
+    while (1);  
+}
+
 static uint8_t char_to_hid_release(uint16_t k)
 {
     if (k < 128) {
@@ -448,6 +461,19 @@ void keypad_action(uint8_t col, uint8_t mode)
         case _TRACKBALL_BTN:
             if (mode == KEY_PRESSED) {
                 hid_mouse_press(MOUSE_MIDDLE);
+            } else if (mode == KEY_RELEASED) {
+                keypad_release(col, k);
+            }
+            break;
+            
+        case KEY_KEYPAD_ASTERISK:
+            // Check if Fn is pressed (Fn + * = bootloader)
+            if (mode == KEY_PRESSED && keyboard_state.fn_on > 0) {
+                // Jump to bootloader
+                jump_to_bootloader();
+            } else if (mode == KEY_PRESSED) {
+                // Normal keypad * key
+                hid_keyboard_press(KEY_KEYPAD_ASTERISK);
             } else if (mode == KEY_RELEASED) {
                 keypad_release(col, k);
             }
