@@ -11,6 +11,7 @@
 int8_t hid_mouse_move(int8_t x, int8_t y, int8_t wheel);
 int8_t hid_mouse_press(uint8_t button);
 int8_t hid_mouse_release(uint8_t button);
+int8_t hid_mouse_release_all(void);
 
 #endif
 
