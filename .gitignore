@@ -1,0 +1,78 @@
+# Build output
+build/
+*.o
+*.d
+*.lst
+*.map
+*.elf
+*.hex
+*.bin
+*.su
+*.idb
+*.pdb
+
+# IDE - Visual Studio Code / Cursor
+.vscode/
+
+# IDE - clangd
+.clangd
+
+# IDE - Eclipse
+.metadata
+.settings/
+.project
+.cproject
+
+# IDE - STM32CubeIDE
+.mxproject
+.project
+.settings/
+Debug/
+Release/
+
+# IDE - IAR
+*.eww
+*.ewp
+*.ewd
+*.ewt
+*.dep
+*.plg
+Listings/
+Obj/
+
+# IDE - Keil MDK
+*.uvguix*
+*.uvoptx
+*.uvprojx
+*.plg
+*.tra
+*.iex
+*.htm
+*.sct
+*.lnp
+*.crf
+*.axf
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.cache
+
+# Backup files
+*.bak
+*.backup
+*~
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
