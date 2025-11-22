@@ -43,6 +43,12 @@
 #define KEY_F11            0x44
 #define KEY_F12            0x45
 
+// Keypad codes
+#define KEY_KEYPAD_SLASH   0x54  // /
+#define KEY_KEYPAD_ASTERISK 0x55 // *
+#define KEY_KEYPAD_MINUS   0x56  // -
+#define KEY_KEYPAD_PLUS    0x57  // +
+
 int8_t hid_keyboard_press(uint8_t key);
 int8_t hid_keyboard_release(uint8_t key);
 int8_t hid_keyboard_release_all(void);

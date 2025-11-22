@@ -67,7 +67,7 @@ const uint16_t keyboard_maps[][MATRIX_KEYS] = {
 const uint16_t keys_maps[][KEYS_NUM] = {
     [DEF_LAYER] = {
         KEY_UP_ARROW, KEY_DOWN_ARROW, KEY_LEFT_ARROW, KEY_RIGHT_ARROW,
-        _JOYSTICK_A, _JOYSTICK_B, _JOYSTICK_X, _JOYSTICK_Y,
+        KEY_KEYPAD_PLUS, KEY_KEYPAD_MINUS, KEY_KEYPAD_ASTERISK, KEY_KEYPAD_SLASH, // Y, X, B, A -> +, -, *, /
         KEY_LEFT_SHIFT, KEY_RIGHT_SHIFT, KEY_LEFT_CTRL, KEY_RIGHT_CTRL,
         KEY_LEFT_ALT, _MOUSE_LEFT, KEY_RIGHT_ALT, _MOUSE_RIGHT,
         _TRACKBALL_BTN
@@ -75,7 +75,7 @@ const uint16_t keys_maps[][KEYS_NUM] = {
     
     [FN_LAYER] = {
         KEY_PAGE_UP, KEY_PAGE_DOWN, KEY_HOME, KEY_END,
-        _JOYSTICK_A, _JOYSTICK_B, _JOYSTICK_X, _JOYSTICK_Y,
+        KEY_KEYPAD_PLUS, KEY_KEYPAD_MINUS, KEY_KEYPAD_ASTERISK, KEY_KEYPAD_SLASH, // Y, X, B, A -> +, -, *, /
         _FN_SHIFT, _FN_SHIFT, KEY_LEFT_CTRL, KEY_RIGHT_CTRL,
         KEY_RIGHT_GUI, _MOUSE_LEFT, KEY_RIGHT_ALT, _MOUSE_RIGHT,
         _TRACKBALL_BTN
@@ -95,11 +95,6 @@ static uint8_t char_to_hid_release(uint16_t k)
     return (uint8_t)k;
 }
 
-static uint8_t check_pd2(void)
-{
-    // PD2 is switch 2 in back - not used in new implementation
-    return 0;
-}
 
 static void keyboard_release_core(uint16_t k)
 {
@@ -109,15 +104,11 @@ static void keyboard_release_core(uint16_t k)
             break;
             
         case _SELECT_KEY:
-            if (check_pd2() == 1) {
-                hid_keyboard_release(char_to_hid(' '));
-            }
+            // SELECT key - not used in new implementation
             break;
             
         case _START_KEY:
-            if (check_pd2() == 1) {
-                hid_keyboard_release(KEY_RETURN);
-            }
+            // START key - not used in new implementation
             break;
             
         case _FN_BRIGHTNESS_UP:
@@ -185,25 +176,17 @@ void keyboard_action(uint8_t row, uint8_t col, uint8_t mode)
             break;
             
         case _SELECT_KEY:
-            if (check_pd2() == 1) {
-                if (mode == KEY_PRESSED) {
-                    hid_keyboard_press(char_to_hid(' '));
-                    keyboard_state.select_on = 1;
-                } else if (mode == KEY_RELEASED) {
-                    keyboard_release(addr, char_to_hid(' '));
-                    keyboard_state.select_on = 0;
-                }
+            // SELECT key - not used in new implementation
+            // Keep select_on state for trackball wheel mode
+            if (mode == KEY_PRESSED) {
+                keyboard_state.select_on = 1;
+            } else if (mode == KEY_RELEASED) {
+                keyboard_state.select_on = 0;
             }
             break;
             
         case _START_KEY:
-            if (check_pd2() == 1) {
-                if (mode == KEY_PRESSED) {
-                    hid_keyboard_press(KEY_RETURN);
-                } else if (mode == KEY_RELEASED) {
-                    keyboard_release(addr, KEY_RETURN);
-                }
-            }
+            // START key - not used in new implementation
             break;
             
         case _FN_BRIGHTNESS_UP:
