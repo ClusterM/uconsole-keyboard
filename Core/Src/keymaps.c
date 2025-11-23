@@ -11,7 +11,7 @@ KEYBOARD_STATE keyboard_state;
 // Mappings for the keyboard matrix
 const uint16_t matrix_maps[][MATRIX_KEYS] = {
     [DEF_LAYER] = {
-        SK_SELECT_KEY, SK_START_KEY, SK_VOLUME_M, KEY_GRAVE, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_MINUS, KEY_EQUAL,
+        EMP, EMP, CONSUMER_VOLUME_DOWN, KEY_GRAVE, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_MINUS, KEY_EQUAL,
         KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8,
         KEY_9, KEY_0, KEY_ESC, KEY_TAB, EMP, EMP, EMP, EMP,
         KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_U, KEY_I,
@@ -22,13 +22,13 @@ const uint16_t matrix_maps[][MATRIX_KEYS] = {
     },
     
     [FN_LAYER] = {
-        KEY_PRNT_SCRN, KEY_PAUSE, SK_VOLUME_MUTE, KEY_GRAVE, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_F11, KEY_F12,
+        KEY_PRNT_SCRN, KEY_PAUSE, CONSUMER_MUTE, KEY_GRAVE, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_F11, KEY_F12,
         KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8,
         KEY_F9, KEY_F10, SK_KEYBOARD_LOCK, KEY_CAPS_LOCK, EMP, EMP, EMP, EMP,
         KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_PAGE_UP, KEY_INSERT,
         KEY_O, KEY_P, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_HOME,
         KEY_END, KEY_PAGE_DOWN, KEY_L, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,
-        KEY_N, KEY_M, SK_BRIGHTNESS_DOWN, SK_BRIGHTNESS_UP, KEY_SLASH, KEY_BACKSLASH, KEY_SEMICOLON, KEY_APOSTROPHE,
+        KEY_N, KEY_M, CONSUMER_BRIGHTNESS_DOWN, CONSUMER_BRIGHTNESS_UP, KEY_SLASH, KEY_BACKSLASH, KEY_SEMICOLON, KEY_APOSTROPHE,
         KEY_DELETE, KEY_RETURN, SK_FN_KEY, SK_FN_KEY, SK_KEYBOARD_LIGHT, EMP, EMP, EMP
     }
 };
@@ -36,7 +36,7 @@ const uint16_t matrix_maps[][MATRIX_KEYS] = {
 // Mappings for the non-matrix keys
 const uint16_t keys_maps[][KEYS_NUM] = {
     [DEF_LAYER] = {
-        SK_MOUSE_MID,           // Trackball button
+        MOUSE_MIDDLE,           // Trackball button
         KEY_UP_ARROW,           // Up
         KEY_DOWN_ARROW,         // Down
         KEY_LEFT_ARROW,         // Left
@@ -50,13 +50,13 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_LEFT_CTRL,          // Left ctrl
         KEY_RIGHT_CTRL,         // Right ctrl
         KEY_LEFT_ALT,           // Left alt
-        SK_MOUSE_LEFT,          // Gamepad L
+        MOUSE_LEFT,             // Gamepad L
         KEY_RIGHT_ALT,          // Right alt
-        SK_MOUSE_RIGHT          // Gamepad R
+        MOUSE_RIGHT,            // Gamepad R
     },
     
     [FN_LAYER] = {
-        SK_MOUSE_MID,           // Trackball button
+        MOUSE_MIDDLE,           // Trackball button
         KEY_PAGE_UP,            // Up
         KEY_PAGE_DOWN,          // Down
         KEY_HOME,               // Left
@@ -70,9 +70,9 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_LEFT_CTRL,          // Left ctrl
         KEY_RIGHT_CTRL,         // Right ctrl
         KEY_LEFT_GUI,           // Left alt
-        SK_MOUSE_LEFT,          // Gamepad L
+        MOUSE_LEFT,             // Gamepad L
         KEY_RIGHT_ALT,          // Right alt
-        SK_MOUSE_RIGHT          // Gamepad R
+        MOUSE_RIGHT,            // Gamepad R
     }
 };
 
@@ -82,72 +82,28 @@ static void jump_to_bootloader(void);
 
 static void do_the_key(uint16_t k, uint8_t mode)
 {
-    switch (k) {
-        case EMP:
-            break;
 
+
+    switch (k) {
         case SK_FN_KEY:
             keyboard_state.layer = mode == KEY_PRESSED ? FN_LAYER : DEF_LAYER;
             break;
 
-        case KEY_LEFT_CTRL:
-        case KEY_RIGHT_CTRL:
-        case KEY_LEFT_ALT:
-        case KEY_RIGHT_ALT:
-        case KEY_LEFT_SHIFT:
-        case KEY_RIGHT_SHIFT:
-        case KEY_LEFT_GUI:
-        case KEY_RIGHT_GUI:
-            k &= ~MODIFIER_FLAG; // Clear internal code flag
-            if (mode == KEY_PRESSED) {
-                keyboard_state.mod_keys_on |= k;
-            } else {
-                keyboard_state.mod_keys_on &= ~k;
-            }
-            hid_keyboard_modifier(k, mode);
-            break;
-
-        case SK_MOUSE_LEFT:
-        case SK_MOUSE_MID:
-        case SK_MOUSE_RIGHT:
-            hid_mouse_button(k, mode);
-            break;
-
-        case SK_SELECT_KEY:
-        case SK_START_KEY:
-            // TODO?
-            break;
-
-        case SK_BRIGHTNESS_UP:
-            hid_consumer_button(CONSUMER_BRIGHTNESS_UP, mode);
-            break;
-
-        case SK_BRIGHTNESS_DOWN:
-            hid_consumer_button(CONSUMER_BRIGHTNESS_DOWN, mode);
-            break;
-
-        case SK_VOLUME_P:
-            hid_consumer_button(CONSUMER_VOLUME_UP, mode);
-            break;
-
-        case SK_VOLUME_M:
+        case CONSUMER_VOLUME_DOWN:
+            /* Override volume down button, so shift+vol_down = vol_up */
             if (mode == KEY_PRESSED) {
                 if (keyboard_state.mod_keys_on & (KEY_LEFT_SHIFT | KEY_RIGHT_SHIFT)) {
                     // Shift was pressed - increase volume, but release the shift first
                     hid_keyboard_modifier((uint8_t)(KEY_LEFT_SHIFT | KEY_RIGHT_SHIFT), KEY_RELEASED);
-                    hid_consumer_button(CONSUMER_VOLUME_UP, KEY_PRESSED);
+                    hid_consumer_button((uint8_t)CONSUMER_VOLUME_UP, KEY_PRESSED);
                 } else {
                     // No shift - decrease volume
-                    hid_consumer_button(CONSUMER_VOLUME_DOWN, KEY_PRESSED);
+                    hid_consumer_button((uint8_t)CONSUMER_VOLUME_DOWN, KEY_PRESSED);
                 }
             } else {
-                hid_consumer_button(CONSUMER_VOLUME_UP, KEY_RELEASED);
-                hid_consumer_button(CONSUMER_VOLUME_DOWN, KEY_RELEASED);
+                hid_consumer_button((uint8_t)CONSUMER_VOLUME_UP, KEY_RELEASED);
+                hid_consumer_button((uint8_t)CONSUMER_VOLUME_DOWN, KEY_RELEASED);
             }
-            break;
-
-        case SK_VOLUME_MUTE:
-            hid_consumer_button(CONSUMER_MUTE, mode);
             break;
 
         case SK_KEYBOARD_LOCK:
@@ -176,8 +132,23 @@ static void do_the_key(uint16_t k, uint8_t mode)
             hid_keyboard_button(KEY_KEYPAD_ASTERISK, mode);
             break;
 
+        case EMP:
+            /* Do nothing */
+            break;
+
         default:
-            if (k < 0x100) {
+            if (k & MODIFIER_KEY_FLAG) {
+                hid_keyboard_modifier((uint8_t)k, mode);
+                if (mode == KEY_PRESSED) {
+                    keyboard_state.mod_keys_on |= (uint8_t)k;
+                } else {
+                    keyboard_state.mod_keys_on &= ~(uint8_t)k;
+                }                
+            } else if (k & MOUSE_BUTTON_FLAG) {
+                hid_mouse_button((uint8_t)k, mode);
+            } else if (k & CONSUMEY_KEY_FLAG) {
+                hid_consumer_button((uint8_t)k, mode);
+            } else if (k < 0x100) {
                 hid_keyboard_button((uint8_t)k, mode);
             }
             break;
