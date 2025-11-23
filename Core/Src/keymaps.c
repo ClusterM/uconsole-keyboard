@@ -299,7 +299,7 @@ static void keypad_release_core(uint16_t k)
         case KEY_RIGHT_SHIFT:
             // Sticky keys - currently not used/implemented
             // if (keyboard_state.shift.lock == 0) {
-                hid_keyboard_release(k);
+                hid_keyboard_clear_modifier((uint8_t)k);
                 // keyboard_state.shift.begin = 0;
                 // keyboard_state.shift.time = 0;
                 keyboard_state.sf_on = 0;
