@@ -22,6 +22,7 @@ static RateMeter rateMeter[AXIS_NUM];
 static Glider glider[AXIS_NUM];
 static int8_t wheelBuffer;
 static bool asWheel = false;
+static bool lastWheelMode = false;
 
 static float rateToVelocityCurve(float input)
 {
@@ -115,18 +116,40 @@ void trackball_interrupt_y_pos(void)
 
 void trackball_task(void)
 {
+    static uint32_t last_time = 0;
+    uint32_t current_time = HAL_GetTick();
+    uint8_t delta = 1;
+    
+    if (last_time != 0) {
+        uint32_t time_delta = current_time - last_time;
+        // Clamp delta to reasonable range (1-255 ms, uint8_t limit)
+        if (time_delta == 0) {
+            time_delta = 1; // Minimum 1 ms
+        } else if (time_delta > 255) {
+            time_delta = 255; // Maximum uint8_t
+        }
+        delta = (uint8_t)time_delta;
+    } else {
+        // First call - initialize last_time
+        last_time = current_time;
+        return; // Skip first iteration to get proper delta next time
+    }
+    last_time = current_time;
+    
     int8_t x = 0, y = 0, w = 0;
     
     __disable_irq();
-    asWheel = keyboard_state.select_on == 1;
+    // Use fn_on instead of select_on for wheel mode (Fn + trackball)
+    asWheel = keyboard_state.fn_on > 0;
     
-    if (asWheel) {
-        ratemeter_expire(&rateMeter[AXIS_X]);
-        ratemeter_expire(&rateMeter[AXIS_Y]);
-        wheelBuffer = 0;
-    } else {
-        ratemeter_tick(&rateMeter[AXIS_X], 1);
-        ratemeter_tick(&rateMeter[AXIS_Y], 1);
+    // Reset wheel buffer only when switching modes
+    if (asWheel != lastWheelMode) {
+        if (asWheel) {
+            ratemeter_expire(&rateMeter[AXIS_X]);
+            ratemeter_expire(&rateMeter[AXIS_Y]);
+            wheelBuffer = 0;
+        }
+        lastWheelMode = asWheel;
     }
     
     if (asWheel) {
@@ -134,8 +157,10 @@ void trackball_task(void)
         w = wheelBuffer / WHEEL_DENOM;
         wheelBuffer -= w * WHEEL_DENOM;
     } else {
-        GlideResult rX = glider_glide(&glider[AXIS_X], 1);
-        GlideResult rY = glider_glide(&glider[AXIS_Y], 1);
+        ratemeter_tick(&rateMeter[AXIS_X], delta);
+        ratemeter_tick(&rateMeter[AXIS_Y], delta);
+        GlideResult rX = glider_glide(&glider[AXIS_X], delta);
+        GlideResult rY = glider_glide(&glider[AXIS_Y], delta);
         x = rX.value;
         y = rY.value;
         if (rX.stopped) {
@@ -167,5 +192,6 @@ void trackball_init(void)
     distances[AXIS_Y] = 0;
     wheelBuffer = 0;
     asWheel = false;
+    lastWheelMode = false;
 }
 
