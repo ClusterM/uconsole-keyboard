@@ -45,7 +45,7 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_PAGE_UP, KEY_PAGE_DOWN, KEY_HOME, KEY_END,
         KEY_KEYPAD_PLUS, KEY_KEYPAD_MINUS, KEY_KEYPAD_ASTERISK, KEY_KEYPAD_SLASH, // Y, X, B, A -> +, -, *, /
         _FN_SHIFT, _FN_SHIFT, KEY_LEFT_CTRL, KEY_RIGHT_CTRL,
-        KEY_LEFT_GUI, _MOUSE_LEFT, KEY_RIGHT_ALT, _MOUSE_RIGHT,
+        KEY_RIGHT_GUI, _MOUSE_LEFT, KEY_RIGHT_ALT, _MOUSE_RIGHT,
         _TRACKBALL_BTN
     }
 };
@@ -161,8 +161,9 @@ void keyboard_action(uint8_t row, uint8_t col, uint8_t mode)
     
     if (mode == KEY_PRESSED) {
         if (keyboard_pick_map[addr] == 0) {
-            // Store key code (all keys are now HID codes, no ASCII conflicts)
-            keyboard_pick_map[addr] = k;
+            if (k != _FN_LOCK_KEYBOARD && k != _FN_LIGHT_KEYBOARD) {
+                keyboard_pick_map[addr] = k;
+            }
         }
     }
     
@@ -243,6 +244,10 @@ void keyboard_action(uint8_t row, uint8_t col, uint8_t mode)
         case _FN_LOCK_KEYBOARD:
             if (mode == KEY_PRESSED) {
                 keyboard_state.lock = keyboard_state.lock ^ 1;
+            } else if (mode == KEY_RELEASED) {
+                // Clear the stored key so that the next press will work correctly
+                // (whether it's Escape without Fn, or _FN_LOCK_KEYBOARD with Fn)
+                keyboard_pick_map[addr] = 0;
             }
             break;
             
@@ -253,6 +258,9 @@ void keyboard_action(uint8_t row, uint8_t col, uint8_t mode)
                     keyboard_state.backlight = 0;
                 }
                 // PWM will be set in main loop
+            } else if (mode == KEY_RELEASED) {
+                // Clear the stored key so that the next press will work correctly
+                keyboard_pick_map[addr] = 0;
             }
             break;
             
