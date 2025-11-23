@@ -9,11 +9,12 @@ typedef struct {
     uint32_t de_time;
 } KEY_DEB;
 
-typedef struct {
-    uint16_t lock;
-    uint16_t time;
-    uint16_t begin;
-} KEYBOARD_LOCK;
+// Sticky keys functionality - currently not used/implemented
+// typedef struct {
+//     uint16_t lock;
+//     uint16_t time;
+//     uint16_t begin;
+// } KEYBOARD_LOCK;
 
 typedef struct {
     uint8_t layer;
@@ -25,10 +26,11 @@ typedef struct {
     uint8_t backlight;
     uint8_t lock;
     
-    KEYBOARD_LOCK ctrl;
-    KEYBOARD_LOCK shift;
-    KEYBOARD_LOCK alt;
-    KEYBOARD_LOCK fn;
+    // Sticky keys functionality - currently not used/implemented
+    // KEYBOARD_LOCK ctrl;
+    // KEYBOARD_LOCK shift;
+    // KEYBOARD_LOCK alt;
+    // KEYBOARD_LOCK fn;
 } KEYBOARD_STATE;
 
 extern KEYBOARD_STATE keyboard_state;

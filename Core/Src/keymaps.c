@@ -110,8 +110,9 @@ static void keyboard_release_core(uint16_t k)
             
         case _FN_KEY:
             keyboard_state.fn_on = 0;
-            keyboard_state.fn.begin = 0;
-            keyboard_state.fn.time = 0;
+            // Sticky keys - currently not used/implemented
+            // keyboard_state.fn.begin = 0;
+            // keyboard_state.fn.time = 0;
             break;
             
         default:
@@ -264,14 +265,16 @@ void keyboard_action(uint8_t row, uint8_t col, uint8_t mode)
             
         case _FN_KEY:
             if (mode == KEY_PRESSED) {
-                if (keyboard_state.fn.lock == 0) {
+                // Sticky keys - currently not used/implemented
+                // if (keyboard_state.fn.lock == 0) {
                     keyboard_state.fn_on = FN_LAYER;
-                    keyboard_state.fn.begin = k;
-                }
+                    // keyboard_state.fn.begin = k;
+                // }
             } else if (mode == KEY_RELEASED) {
                 keyboard_state.fn_on = 0;
-                keyboard_state.fn.begin = 0;
-                keyboard_state.fn.time = 0;
+                // Sticky keys - currently not used/implemented
+                // keyboard_state.fn.begin = 0;
+                // keyboard_state.fn.time = 0;
             }
             break;
             
@@ -294,12 +297,13 @@ static void keypad_release_core(uint16_t k)
             
         case KEY_LEFT_SHIFT:
         case KEY_RIGHT_SHIFT:
-            if (keyboard_state.shift.lock == 0) {
+            // Sticky keys - currently not used/implemented
+            // if (keyboard_state.shift.lock == 0) {
                 hid_keyboard_release(k);
-                keyboard_state.shift.begin = 0;
-                keyboard_state.shift.time = 0;
+                // keyboard_state.shift.begin = 0;
+                // keyboard_state.shift.time = 0;
                 keyboard_state.sf_on = 0;
-            }
+            // }
             break;
             
         case _MOUSE_LEFT:
@@ -316,20 +320,22 @@ static void keypad_release_core(uint16_t k)
             
         case KEY_LEFT_CTRL:
         case KEY_RIGHT_CTRL:
-            if (keyboard_state.ctrl.lock == 0) {
+            // Sticky keys - currently not used/implemented
+            // if (keyboard_state.ctrl.lock == 0) {
                 hid_keyboard_clear_modifier((uint8_t)k);  // Use clear_modifier for explicit modifier handling
-                keyboard_state.ctrl.begin = 0;
-                keyboard_state.ctrl.time = 0;
-            }
+                // keyboard_state.ctrl.begin = 0;
+                // keyboard_state.ctrl.time = 0;
+            // }
             break;
             
         case KEY_LEFT_ALT:
         case KEY_RIGHT_ALT:
-            if (keyboard_state.alt.lock == 0) {
+            // Sticky keys - currently not used/implemented
+            // if (keyboard_state.alt.lock == 0) {
                 hid_keyboard_clear_modifier((uint8_t)k);  // Use clear_modifier for explicit modifier handling
-                keyboard_state.alt.begin = 0;
-                keyboard_state.alt.time = 0;
-            }
+                // keyboard_state.alt.begin = 0;
+                // keyboard_state.alt.time = 0;
+            // }
             break;
             
         case KEY_LEFT_GUI:
@@ -389,11 +395,12 @@ void keypad_action(uint8_t col, uint8_t mode)
         case KEY_LEFT_SHIFT:
         case KEY_RIGHT_SHIFT:
             if (mode == KEY_PRESSED) {
-                if (keyboard_state.shift.lock == 0) {
+                // Sticky keys - currently not used/implemented
+                // if (keyboard_state.shift.lock == 0) {
                     hid_keyboard_set_modifier((uint8_t)k);  // Use set_modifier for explicit modifier handling
-                    keyboard_state.shift.begin = k;
+                    // keyboard_state.shift.begin = k;
                     keyboard_state.sf_on = k;
-                }
+                // }
             } else if (mode == KEY_RELEASED) {
                 keypad_release(col, k);
             }
@@ -426,10 +433,11 @@ void keypad_action(uint8_t col, uint8_t mode)
         case KEY_LEFT_CTRL:
         case KEY_RIGHT_CTRL:
             if (mode == KEY_PRESSED) {
-                if (keyboard_state.ctrl.lock == 0) {
+                // Sticky keys - currently not used/implemented
+                // if (keyboard_state.ctrl.lock == 0) {
                     hid_keyboard_set_modifier((uint8_t)k);  // Use set_modifier for explicit modifier handling
-                    keyboard_state.ctrl.begin = k;
-                }
+                    // keyboard_state.ctrl.begin = k;
+                // }
             } else {
                 keypad_release(col, k);
             }
@@ -438,10 +446,11 @@ void keypad_action(uint8_t col, uint8_t mode)
         case KEY_LEFT_ALT:
         case KEY_RIGHT_ALT:
             if (mode == KEY_PRESSED) {
-                if (keyboard_state.alt.lock == 0) {
+                // Sticky keys - currently not used/implemented
+                // if (keyboard_state.alt.lock == 0) {
                     hid_keyboard_set_modifier((uint8_t)k);  // Use set_modifier for explicit modifier handling
-                    keyboard_state.alt.begin = k;
-                }
+                    // keyboard_state.alt.begin = k;
+                // }
             } else {
                 keypad_release(col, k);
             }

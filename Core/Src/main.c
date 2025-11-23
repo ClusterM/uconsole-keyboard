@@ -171,21 +171,19 @@ int main(void)
   keyboard_state.backlight = 0;
   keyboard_state.lock = 0;
   
-  keyboard_state.ctrl.lock = 0;
-  keyboard_state.ctrl.time = 0;
-  keyboard_state.ctrl.begin = 0;
-  
-  keyboard_state.shift.lock = 0;
-  keyboard_state.shift.time = 0;
-  keyboard_state.shift.begin = 0;
-  
-  keyboard_state.alt.lock = 0;
-  keyboard_state.alt.time = 0;
-  keyboard_state.alt.begin = 0;
-  
-  keyboard_state.fn.lock = 0;
-  keyboard_state.fn.time = 0;
-  keyboard_state.fn.begin = 0;
+  // Sticky keys initialization - currently not used/implemented
+  // keyboard_state.ctrl.lock = 0;
+  // keyboard_state.ctrl.time = 0;
+  // keyboard_state.ctrl.begin = 0;
+  // keyboard_state.shift.lock = 0;
+  // keyboard_state.shift.time = 0;
+  // keyboard_state.shift.begin = 0;
+  // keyboard_state.alt.lock = 0;
+  // keyboard_state.alt.time = 0;
+  // keyboard_state.alt.begin = 0;
+  // keyboard_state.fn.lock = 0;
+  // keyboard_state.fn.time = 0;
+  // keyboard_state.fn.begin = 0;
   
   // Initialize modules
   keyboard_init();
