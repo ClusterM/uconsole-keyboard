@@ -37,12 +37,12 @@ static int8_t hid_mouse_release(uint8_t button)
 }
 
 
-int8_t hid_mouse_button(uint8_t button, uint8_t mode)
+int8_t hid_mouse_button(uint16_t button, uint8_t mode)
 {
     if (mode == KEY_PRESSED) {
-        return hid_mouse_press(button);
+        return hid_mouse_press((uint8_t)button);
     } else {
-        return hid_mouse_release(button);
+        return hid_mouse_release((uint8_t)button);
     }
 }
 

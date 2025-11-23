@@ -21,12 +21,12 @@ static int8_t hid_keyboard_clear_modifier(uint8_t modifier_bit)
     return result;
 }
 
-int8_t hid_keyboard_modifier(uint8_t modifier_bit, uint8_t mode)
+int8_t hid_keyboard_modifier(uint16_t modifier_bit, uint8_t mode)
 {
     if (mode == KEY_PRESSED) {
-        return hid_keyboard_set_modifier(modifier_bit);
+        return hid_keyboard_set_modifier((uint8_t)modifier_bit);
     } else {
-        return hid_keyboard_clear_modifier(modifier_bit);
+        return hid_keyboard_clear_modifier((uint8_t)modifier_bit);
     }
 }
 
@@ -58,12 +58,12 @@ static int8_t hid_keyboard_release(uint8_t key)
     return result;
 }
 
-int8_t hid_keyboard_button(uint8_t key, uint8_t mode)
+int8_t hid_keyboard_button(uint16_t key, uint8_t mode)
 {
     if (mode == KEY_PRESSED) {
-        return hid_keyboard_press(key);
+        return hid_keyboard_press((uint8_t)key);
     } else {
-        return hid_keyboard_release(key);
+        return hid_keyboard_release((uint8_t)key);
     }
 }
 

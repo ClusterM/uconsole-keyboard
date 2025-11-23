@@ -11,7 +11,7 @@ static uint16_t consumer_state = 0;
 // This is a simplified mapping - only supports specific codes
 static uint8_t usage_to_bit(uint16_t code)
 {
-    switch (code) {
+    switch (code | CONSUMER_KEY_FLAG) {
         case CONSUMER_VOLUME_UP:      return 0;   // Bit 0
         case CONSUMER_VOLUME_DOWN:    return 1;   // Bit 1
         case CONSUMER_MUTE:           return 2;   // Bit 2
@@ -86,6 +86,7 @@ static int8_t hid_consumer_release(uint16_t code)
 
 int8_t hid_consumer_button(uint16_t code, uint8_t mode)
 {
+    code = code & ~CONSUMER_KEY_FLAG;
     if (mode == KEY_PRESSED) {
         return hid_consumer_press(code);
     } else {

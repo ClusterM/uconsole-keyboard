@@ -82,8 +82,6 @@ static void jump_to_bootloader(void);
 
 static void do_the_key(uint16_t k, uint8_t mode)
 {
-
-
     switch (k) {
         case SK_FN_KEY:
             keyboard_state.layer = mode == KEY_PRESSED ? FN_LAYER : DEF_LAYER;
@@ -94,15 +92,15 @@ static void do_the_key(uint16_t k, uint8_t mode)
             if (mode == KEY_PRESSED) {
                 if (keyboard_state.mod_keys_on & (KEY_LEFT_SHIFT | KEY_RIGHT_SHIFT)) {
                     // Shift was pressed - increase volume, but release the shift first
-                    hid_keyboard_modifier((uint8_t)(KEY_LEFT_SHIFT | KEY_RIGHT_SHIFT), KEY_RELEASED);
-                    hid_consumer_button((uint8_t)CONSUMER_VOLUME_UP, KEY_PRESSED);
+                    hid_keyboard_modifier(KEY_LEFT_SHIFT | KEY_RIGHT_SHIFT, KEY_RELEASED);
+                    hid_consumer_button(CONSUMER_VOLUME_UP, KEY_PRESSED);
                 } else {
                     // No shift - decrease volume
-                    hid_consumer_button((uint8_t)CONSUMER_VOLUME_DOWN, KEY_PRESSED);
+                    hid_consumer_button(CONSUMER_VOLUME_DOWN, KEY_PRESSED);
                 }
             } else {
-                hid_consumer_button((uint8_t)CONSUMER_VOLUME_UP, KEY_RELEASED);
-                hid_consumer_button((uint8_t)CONSUMER_VOLUME_DOWN, KEY_RELEASED);
+                hid_consumer_button(CONSUMER_VOLUME_UP, KEY_RELEASED);
+                hid_consumer_button(CONSUMER_VOLUME_DOWN, KEY_RELEASED);
             }
             break;
 
@@ -137,19 +135,19 @@ static void do_the_key(uint16_t k, uint8_t mode)
             break;
 
         default:
-            if (k & MODIFIER_KEY_FLAG) {
-                hid_keyboard_modifier((uint8_t)k, mode);
+            if (k & CONSUMER_KEY_FLAG) {
+                hid_consumer_button(k, mode);
+            } else if (k & MODIFIER_KEY_FLAG) {
+                hid_keyboard_modifier(k, mode);
                 if (mode == KEY_PRESSED) {
                     keyboard_state.mod_keys_on |= (uint8_t)k;
                 } else {
                     keyboard_state.mod_keys_on &= ~(uint8_t)k;
                 }                
             } else if (k & MOUSE_BUTTON_FLAG) {
-                hid_mouse_button((uint8_t)k, mode);
-            } else if (k & CONSUMEY_KEY_FLAG) {
-                hid_consumer_button((uint8_t)k, mode);
+                hid_mouse_button(k, mode);
             } else if (k < 0x100) {
-                hid_keyboard_button((uint8_t)k, mode);
+                hid_keyboard_button(k, mode);
             }
             break;
     }

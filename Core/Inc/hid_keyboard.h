@@ -106,9 +106,9 @@
 #define KEY_KEYPAD_MINUS   0x56  // -
 #define KEY_KEYPAD_PLUS    0x57  // +
 
-int8_t hid_keyboard_button(uint8_t key, uint8_t mode);
+int8_t hid_keyboard_button(uint16_t key, uint8_t mode);
 int8_t hid_keyboard_release_all(void);
-int8_t hid_keyboard_modifier(uint8_t modifier_bit, uint8_t mode);
+int8_t hid_keyboard_modifier(uint16_t modifier_bit, uint8_t mode);
 void hid_wait_for_usb_idle(void);
 
 #endif

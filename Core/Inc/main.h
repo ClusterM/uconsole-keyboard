@@ -147,7 +147,7 @@ void Error_Handler(void);
 #define KEY_RELEASED 0
 
 #define MODIFIER_KEY_FLAG 0x1000
-#define CONSUMEY_KEY_FLAG 0x2000
+#define CONSUMER_KEY_FLAG 0x2000
 #define MOUSE_BUTTON_FLAG 0x4000
 #define SPECIAL_KEY_FLAG  0x8000
 /* USER CODE END Private defines */
