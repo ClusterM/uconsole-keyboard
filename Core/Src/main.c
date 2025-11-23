@@ -163,10 +163,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   
   // Initialize keyboard state
-  keyboard_state.layer = 0;
-  // keyboard_state.prev_layer = 0;
-  // keyboard_state.fn_on = 0;
-  // keyboard_state.select_on = 0;
+  keyboard_state.layer = DEF_LAYER;
   keyboard_state.mod_keys_on = 0;
   keyboard_state.backlight = 0;
   keyboard_state.lock = 0;

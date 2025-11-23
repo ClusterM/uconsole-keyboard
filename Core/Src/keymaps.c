@@ -111,8 +111,8 @@ static void do_the_key(uint16_t k, uint8_t mode)
         case SK_MOUSE_MID:
         case SK_MOUSE_RIGHT:
             hid_mouse_button(k, mode);
-            break;            
-                        
+            break;
+
         case SK_SELECT_KEY:
         case SK_START_KEY:
             // TODO?
@@ -121,7 +121,7 @@ static void do_the_key(uint16_t k, uint8_t mode)
         case SK_BRIGHTNESS_UP:
             hid_consumer_button(CONSUMER_BRIGHTNESS_UP, mode);
             break;
-            
+
         case SK_BRIGHTNESS_DOWN:
             hid_consumer_button(CONSUMER_BRIGHTNESS_DOWN, mode);
             break;
