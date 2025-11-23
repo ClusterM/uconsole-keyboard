@@ -11,7 +11,7 @@ static uint32_t keys_prev;
 KEY_DEB keypad_debouncing;
 
 // Pin definitions for keys
-static const GPIO_TypeDef* keys_port[KEYS_NUM] = {
+static GPIO_TypeDef* keys_port[KEYS_NUM] = {
     KEY0_GPIO_Port, KEY1_GPIO_Port, KEY2_GPIO_Port, KEY3_GPIO_Port,
     KEY4_GPIO_Port, KEY5_GPIO_Port, KEY6_GPIO_Port, KEY7_GPIO_Port,
     KEY8_GPIO_Port, KEY9_GPIO_Port, KEY10_GPIO_Port, KEY11_GPIO_Port,

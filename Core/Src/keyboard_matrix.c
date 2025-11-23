@@ -13,22 +13,22 @@ static uint8_t matrix_prev[MATRIX_ROWS];
 KEY_DEB keyboard_debouncing;
 
 // Pin definitions for rows and cols
-static const GPIO_TypeDef* matrix_rows_port[MATRIX_ROWS] = {
+static GPIO_TypeDef* matrix_rows_port[MATRIX_ROWS] = {
     ROW1_GPIO_Port, ROW2_GPIO_Port, ROW3_GPIO_Port, ROW4_GPIO_Port,
     ROW5_GPIO_Port, ROW6_GPIO_Port, ROW7_GPIO_Port, ROW8_GPIO_Port
 };
 
-static const uint16_t matrix_rows_pin[MATRIX_ROWS] = {
+static uint16_t matrix_rows_pin[MATRIX_ROWS] = {
     ROW1_Pin, ROW2_Pin, ROW3_Pin, ROW4_Pin,
     ROW5_Pin, ROW6_Pin, ROW7_Pin, ROW8_Pin
 };
 
-static const GPIO_TypeDef* matrix_cols_port[MATRIX_COLS] = {
+static GPIO_TypeDef* matrix_cols_port[MATRIX_COLS] = {
     COL1_GPIO_Port, COL2_GPIO_Port, COL3_GPIO_Port, COL4_GPIO_Port,
     COL5_GPIO_Port, COL6_GPIO_Port, COL7_GPIO_Port, COL8_GPIO_Port
 };
 
-static const uint16_t matrix_cols_pin[MATRIX_COLS] = {
+static uint16_t matrix_cols_pin[MATRIX_COLS] = {
     COL1_Pin, COL2_Pin, COL3_Pin, COL4_Pin,
     COL5_Pin, COL6_Pin, COL7_Pin, COL8_Pin
 };
