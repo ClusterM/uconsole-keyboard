@@ -11,8 +11,8 @@
 
 #define KEYS_NUM 17
 
-void keys_init(void);
-void keys_task(void);
+void non_matrix_init(void);
+void non_matrix_task(void);
 
 #endif
 

@@ -22,8 +22,8 @@
 #define KEY_VOLUME_UP 0x108
 #define KEY_VOLUME_DOWN 0x109
 
-void keyboard_init(void);
-void keyboard_task(void);
+void matrix_init(void);
+void matrix_task(void);
 
 #endif
 

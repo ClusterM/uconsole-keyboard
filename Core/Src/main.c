@@ -22,8 +22,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "keyboard.h"
-#include "keys.h"
+#include "keyboard_matrix.h"
+#include "keyboard_non_matrix.h"
 #include "trackball.h"
 #include "keymaps.h"
 #include "keyboard_state.h"
@@ -164,10 +164,10 @@ int main(void)
   
   // Initialize keyboard state
   keyboard_state.layer = 0;
-  keyboard_state.prev_layer = 0;
-  keyboard_state.fn_on = 0;
-  keyboard_state.select_on = 0;
-  keyboard_state.sf_on = 0;
+  // keyboard_state.prev_layer = 0;
+  // keyboard_state.fn_on = 0;
+  // keyboard_state.select_on = 0;
+  keyboard_state.mod_keys_on = 0;
   keyboard_state.backlight = 0;
   keyboard_state.lock = 0;
   
@@ -186,8 +186,8 @@ int main(void)
   // keyboard_state.fn.begin = 0;
   
   // Initialize modules
-  keyboard_init();
-  keys_init();
+  matrix_init();
+  non_matrix_init();
   trackball_init();
   
   // Start PWM for backlight
@@ -208,9 +208,9 @@ int main(void)
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, backlight_vals[keyboard_state.backlight]);
     
     // Main tasks
+    matrix_task();
+    non_matrix_task();
     trackball_task();
-    keys_task();
-    keyboard_task();
     
     HAL_Delay(1);
     /* USER CODE END WHILE */

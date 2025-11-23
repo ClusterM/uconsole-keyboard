@@ -5,14 +5,16 @@
 #include "usbd_custom_hid_if.h"
 
 // HID Keyboard key codes
-#define KEY_LEFT_CTRL      0x01
-#define KEY_LEFT_SHIFT     0x02
-#define KEY_LEFT_ALT       0x04
-#define KEY_LEFT_GUI       0x08
-#define KEY_RIGHT_CTRL     0x10
-#define KEY_RIGHT_SHIFT    0x20
-#define KEY_RIGHT_ALT      0x40
-#define KEY_RIGHT_GUI      0x80
+
+// Modifier keys, internal codes, real are & ~0x1000
+#define KEY_LEFT_CTRL      0x1001
+#define KEY_LEFT_SHIFT     0x1002
+#define KEY_LEFT_ALT       0x1004
+#define KEY_LEFT_GUI       0x1008
+#define KEY_RIGHT_CTRL     0x1010
+#define KEY_RIGHT_SHIFT    0x1020
+#define KEY_RIGHT_ALT      0x1040
+#define KEY_RIGHT_GUI      0x1080
 
 #define KEY_UP_ARROW       0x52
 #define KEY_DOWN_ARROW     0x51

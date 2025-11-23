@@ -9,7 +9,7 @@
 KEYBOARD_STATE keyboard_state;
 
 // Mappings for the keyboard matrix
-const uint16_t keyboard_maps[][MATRIX_KEYS] = {
+const uint16_t matrix_maps[][MATRIX_KEYS] = {
     [DEF_LAYER] = {
         SK_SELECT_KEY, SK_START_KEY, SK_VOLUME_M, KEY_GRAVE, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_MINUS, KEY_EQUAL,
         KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8,
@@ -24,16 +24,16 @@ const uint16_t keyboard_maps[][MATRIX_KEYS] = {
     [FN_LAYER] = {
         KEY_PRNT_SCRN, KEY_PAUSE, SK_VOLUME_MUTE, KEY_GRAVE, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_F11, KEY_F12,
         KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8,
-        KEY_F9, KEY_F10, SK_FN_LOCK_KEYBOARD, KEY_CAPS_LOCK, EMP, EMP, EMP, EMP,
+        KEY_F9, KEY_F10, SK_KEYBOARD_LOCK, KEY_CAPS_LOCK, EMP, EMP, EMP, EMP,
         KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_PAGE_UP, KEY_INSERT,
         KEY_O, KEY_P, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_HOME,
         KEY_END, KEY_PAGE_DOWN, KEY_L, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,
-        KEY_N, KEY_M, SK_FN_BRIGHTNESS_DOWN, SK_FN_BRIGHTNESS_UP, KEY_SLASH, KEY_BACKSLASH, KEY_SEMICOLON, KEY_APOSTROPHE,
-        KEY_DELETE, KEY_RETURN, SK_FN_KEY, SK_FN_KEY, SK_FN_LIGHT_KEYBOARD, EMP, EMP, EMP
+        KEY_N, KEY_M, SK_BRIGHTNESS_DOWN, SK_BRIGHTNESS_UP, KEY_SLASH, KEY_BACKSLASH, KEY_SEMICOLON, KEY_APOSTROPHE,
+        KEY_DELETE, KEY_RETURN, SK_FN_KEY, SK_FN_KEY, SK_KEYBOARD_LIGHT, EMP, EMP, EMP
     }
 };
 
-// Mappings for the additional keys
+// Mappings for the non-matrix keys
 const uint16_t keys_maps[][KEYS_NUM] = {
     [DEF_LAYER] = {
         SK_MOUSE_MID,           // Trackball button
@@ -51,8 +51,8 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_RIGHT_CTRL,        // Right ctrl
         KEY_LEFT_ALT,          // Left alt
         SK_MOUSE_LEFT,         // Gamepad L
-         KEY_RIGHT_ALT,        // Right alt
-         SK_MOUSE_RIGHT        // Gamepad R
+        KEY_RIGHT_ALT,        // Right alt
+        SK_MOUSE_RIGHT        // Gamepad R
     },
     
     [FN_LAYER] = {
@@ -76,8 +76,222 @@ const uint16_t keys_maps[][KEYS_NUM] = {
     }
 };
 
-static uint16_t keyboard_pick_map[MATRIX_KEYS] = {0};
-static uint16_t keys_pick_map[KEYS_NUM] = {0};
+static uint16_t matrix_pick_map[MATRIX_KEYS] = {0};
+static uint16_t non_matrix_pick_map[KEYS_NUM] = {0};
+static void jump_to_bootloader(void);
+
+static void do_the_key(uint16_t k, uint8_t mode)
+{
+    switch (k) {
+        case SK_FN_KEY:
+            keyboard_state.layer = mode == KEY_PRESSED ? FN_LAYER : 0;
+            break;
+
+        case KEY_LEFT_CTRL:
+        case KEY_RIGHT_CTRL:
+        case KEY_LEFT_ALT:
+        case KEY_RIGHT_ALT:
+        case KEY_LEFT_SHIFT:
+        case KEY_RIGHT_SHIFT:
+        case KEY_LEFT_GUI:
+        case KEY_RIGHT_GUI:
+            k &= ~0x1000; // Clear internal code flag
+            if (mode == KEY_PRESSED) {
+                keyboard_state.mod_keys_on |= k;
+                hid_keyboard_set_modifier((uint8_t)k);
+            } else {
+                keyboard_state.mod_keys_on &= ~k;
+                hid_keyboard_clear_modifier((uint8_t)k);
+            }
+            break;
+
+        case SK_MOUSE_LEFT:
+            if (mode == KEY_PRESSED) {
+                hid_mouse_press(MOUSE_LEFT);
+            } else {
+                hid_mouse_release(MOUSE_LEFT);
+            }
+            break;
+            
+        case SK_MOUSE_MID:
+            if (mode == KEY_PRESSED) {
+                hid_mouse_press(MOUSE_MIDDLE);
+            } else {
+                hid_mouse_release(MOUSE_MIDDLE);
+            }
+            break;
+            
+        case SK_MOUSE_RIGHT:
+            if (mode == KEY_PRESSED) {
+                hid_mouse_press(MOUSE_RIGHT);
+            } else {
+                hid_mouse_release(MOUSE_RIGHT);
+            }
+            break;            
+                        
+        case SK_SELECT_KEY:
+            // SELECT key - not used in new implementation
+            break;
+        
+        case SK_START_KEY:
+            // START key - not used in new implementation
+            break;
+
+        case SK_BRIGHTNESS_UP:
+            if (mode == KEY_PRESSED) {
+                hid_consumer_press(CONSUMER_BRIGHTNESS_UP);
+            } else {
+                hid_consumer_release(CONSUMER_BRIGHTNESS_UP);
+            }
+            break;
+            
+        case SK_BRIGHTNESS_DOWN:
+            if (mode == KEY_PRESSED) {
+                hid_consumer_press(CONSUMER_BRIGHTNESS_DOWN);
+            } else {
+                hid_consumer_release(CONSUMER_BRIGHTNESS_DOWN);
+            }
+            break;
+
+        case SK_VOLUME_P:
+            if (mode == KEY_PRESSED) {
+                hid_consumer_press(CONSUMER_VOLUME_UP);
+            } else {
+                hid_consumer_release(CONSUMER_VOLUME_UP);
+            }
+            break;
+
+        case SK_VOLUME_M:
+            if (mode == KEY_PRESSED) {
+                if (keyboard_state.mod_keys_on & (KEY_LEFT_SHIFT | KEY_RIGHT_SHIFT)) {
+                    // Shift was pressed - increase volume
+                    // Release both shifts in HID report (so they don't affect other keys)
+                    // But keep sf_on set (so subsequent presses will also increase volume)
+                    // Release both shifts in one operation to avoid overwriting reports
+                    // hid_keyboard_release_both_shifts() already waits for USB idle
+                    hid_keyboard_release_both_shifts();
+                    hid_consumer_press(CONSUMER_VOLUME_UP);
+                } else {
+                    // No shift - decrease volume
+                    hid_consumer_press(CONSUMER_VOLUME_DOWN);
+                }
+            } else {
+                hid_consumer_release(CONSUMER_VOLUME_UP);
+                hid_consumer_release(CONSUMER_VOLUME_DOWN);
+            }
+            break;
+
+        case SK_VOLUME_MUTE:
+            if (mode == KEY_PRESSED) {
+                hid_consumer_press(CONSUMER_MUTE);
+            } else {
+                hid_consumer_release(CONSUMER_MUTE);
+            }
+            break;
+
+        case SK_KEYBOARD_LOCK:
+            if (mode == KEY_PRESSED) {
+                keyboard_state.lock ^= 1;
+            }
+            break;
+
+        case SK_KEYBOARD_LIGHT:
+            if (mode == KEY_PRESSED) {
+                keyboard_state.backlight++;
+                if (keyboard_state.backlight >= 3) {
+                    keyboard_state.backlight = 0;
+                }
+                // PWM will be set in main loop
+            }
+            break;
+
+        case KEY_KEYPAD_ASTERISK:
+            // Special case for keypad * key - update mode
+            // Check if Fn is pressed (Fn + * = bootloader)
+            if (mode == KEY_PRESSED && keyboard_state.layer > 0) {
+                // Jump to bootloader
+                jump_to_bootloader();
+            } else if (mode == KEY_PRESSED) {
+                // Normal keypad * key
+                hid_keyboard_press(KEY_KEYPAD_ASTERISK);
+            } else if (mode == KEY_RELEASED) {
+                hid_keyboard_release(KEY_KEYPAD_ASTERISK);
+            }
+            break;
+
+        default:
+            if (k < 0x100) {
+                if (mode == KEY_PRESSED) {
+                    hid_keyboard_press((uint8_t)k);
+                } else {
+                    hid_keyboard_release((uint8_t)k);
+                }
+            }
+            break;
+    }
+}
+
+void matrix_action(uint8_t row, uint8_t col, uint8_t mode)
+{
+    uint16_t k;
+    uint8_t addr = row * MATRIX_COLS + col;
+    
+    k = matrix_maps[keyboard_state.layer][addr];
+    
+    if (k == EMP) {
+        return;
+    }
+    
+    if (k != SK_FN_KEY && k != SK_KEYBOARD_LOCK && keyboard_state.lock == 1) {
+        return;
+    }
+    
+    if (mode == KEY_PRESSED) {
+        if (matrix_pick_map[addr] == 0) {
+            matrix_pick_map[addr] = k;
+        }
+        do_the_key(k, KEY_PRESSED);
+    } else {
+        if (matrix_pick_map[addr] == 0) {
+            // No stored value, use provided HID code
+            do_the_key(k, KEY_RELEASED);
+        } else {
+            // Use stored value (already HID code)
+            uint16_t stored_key = matrix_pick_map[addr];
+            matrix_pick_map[addr] = 0;
+            do_the_key(stored_key, KEY_RELEASED);
+        }
+    }
+}
+
+void non_matrix_action(uint8_t col, uint8_t mode)
+{
+    uint16_t k;
+    
+    k = keys_maps[keyboard_state.layer][col];
+    
+    if (k == EMP) {
+        return;
+    }
+
+    if (k != SK_FN_KEY && k != SK_KEYBOARD_LOCK && keyboard_state.lock == 1) {
+        return;
+    }
+    
+    if (mode == KEY_PRESSED) {
+        if (non_matrix_pick_map[col] == 0) {
+            non_matrix_pick_map[col] = k;
+        }
+        do_the_key(k, KEY_PRESSED);
+    } else {
+        if (non_matrix_pick_map[col] == 0) {
+            do_the_key(k, KEY_RELEASED);
+        } else {
+            do_the_key(non_matrix_pick_map[col], KEY_RELEASED);
+            non_matrix_pick_map[col] = 0;
+        }
+    }
+}
 
 /**
   * @brief  Reset to bootloader via watchdog
@@ -91,416 +305,3 @@ static void jump_to_bootloader(void)
     IWDG->KR = 0xCCCC;
     while (1);  
 }
-
-
-
-static void keyboard_release_core(uint16_t k)
-{
-    switch (k) {
-        case KEY_CAPS_LOCK:
-            hid_keyboard_release(k);
-            break;
-            
-        case SK_SELECT_KEY:
-            // SELECT key - not used in new implementation
-            break;
-            
-        case SK_START_KEY:
-            // START key - not used in new implementation
-            break;
-            
-        case SK_FN_BRIGHTNESS_UP:
-            hid_consumer_release(CONSUMER_BRIGHTNESS_UP);
-            break;
-            
-        case SK_FN_BRIGHTNESS_DOWN:
-            hid_consumer_release(CONSUMER_BRIGHTNESS_DOWN);
-            break;
-            
-        case SK_VOLUME_P:
-            hid_consumer_release(CONSUMER_VOLUME_UP);
-            break;
-            
-        case SK_VOLUME_M:
-            // This can be either VOLUME_UP (with Shift) or VOLUME_DOWN (without Shift)
-            // We need to release the one that was actually pressed
-            // Since we don't track which one was pressed here, release both
-            // (only the one that was actually pressed will have an effect)
-            hid_consumer_release(CONSUMER_VOLUME_UP);
-            hid_consumer_release(CONSUMER_VOLUME_DOWN);
-            break;
-            
-        case SK_VOLUME_MUTE:
-            hid_consumer_release(CONSUMER_MUTE);
-            break;
-            
-        case SK_FN_KEY:
-            keyboard_state.fn_on = 0;
-            // Sticky keys - currently not used/implemented
-            // keyboard_state.fn.begin = 0;
-            // keyboard_state.fn.time = 0;
-            break;
-            
-        default:
-            // All keys are now HID codes (or special constants >= 0x100)
-            // For regular HID codes (< 0x100), release directly
-            // For special constants (>= 0x100), they should be handled above
-            if (k < 0x100) {
-                hid_keyboard_release((uint8_t)k);
-            }
-            break;
-    }
-}
-
-static void keyboard_release(uint8_t addr, uint16_t k)
-{
-    if (keyboard_pick_map[addr] == 0) {
-        // No stored value, use provided HID code
-        keyboard_release_core(k);
-    } else {
-        // Use stored value (already HID code)
-        uint16_t stored_key = keyboard_pick_map[addr];
-        keyboard_pick_map[addr] = 0;
-        keyboard_release_core(stored_key);
-    }
-}
-
-void keyboard_action(uint8_t row, uint8_t col, uint8_t mode)
-{
-    uint16_t k;
-    uint8_t addr = row * MATRIX_COLS + col;
-    
-    if (keyboard_state.fn_on > 0) {
-        k = keyboard_maps[keyboard_state.fn_on][addr];
-    } else {
-        k = keyboard_maps[keyboard_state.layer][addr];
-    }
-    
-    if (k == EMP) {
-        return;
-    }
-    
-    if (k != SK_FN_KEY && k != SK_FN_LOCK_KEYBOARD && keyboard_state.lock == 1) {
-        return;
-    }
-    
-    if (mode == KEY_PRESSED) {
-        if (keyboard_pick_map[addr] == 0) {
-            if (k != SK_FN_LOCK_KEYBOARD && k != SK_FN_LIGHT_KEYBOARD) {
-                keyboard_pick_map[addr] = k;
-            }
-        }
-    }
-    
-    switch (k) {
-        case KEY_CAPS_LOCK:
-            if (mode == KEY_PRESSED) {
-                hid_keyboard_press(k);
-            } else if (mode == KEY_RELEASED) {
-                keyboard_release(addr, k);
-            }
-            break;
-            
-        case SK_SELECT_KEY:
-            // SELECT key - not used in new implementation
-            // Keep select_on state for trackball wheel mode
-            if (mode == KEY_PRESSED) {
-                keyboard_state.select_on = 1;
-            } else if (mode == KEY_RELEASED) {
-                keyboard_state.select_on = 0;
-            }
-            break;
-            
-        case SK_START_KEY:
-            // START key - not used in new implementation
-            break;
-            
-        case SK_FN_BRIGHTNESS_UP:
-            if (mode == KEY_PRESSED) {
-                hid_consumer_press(CONSUMER_BRIGHTNESS_UP);
-            } else {
-                keyboard_release(addr, k);
-            }
-            break;
-            
-        case SK_FN_BRIGHTNESS_DOWN:
-            if (mode == KEY_PRESSED) {
-                hid_consumer_press(CONSUMER_BRIGHTNESS_DOWN);
-            } else {
-                keyboard_release(addr, k);
-            }
-            break;
-            
-        case SK_VOLUME_P:
-            if (mode == KEY_PRESSED) {
-                hid_consumer_press(CONSUMER_VOLUME_UP);
-            } else {
-                keyboard_release(addr, k);
-            }
-            break;
-            
-        case SK_VOLUME_M:
-            if (mode == KEY_PRESSED) {
-                if (keyboard_state.sf_on > 0) {
-                    // Shift was pressed - increase volume
-                    // Release both shifts in HID report (so they don't affect other keys)
-                    // But keep sf_on set (so subsequent presses will also increase volume)
-                    // Release both shifts in one operation to avoid overwriting reports
-                    // hid_keyboard_release_both_shifts() already waits for USB idle
-                    hid_keyboard_release_both_shifts();
-                    hid_consumer_press(CONSUMER_VOLUME_UP);
-                } else {
-                    // No shift - decrease volume
-                    hid_consumer_press(CONSUMER_VOLUME_DOWN);
-                }
-            } else {
-                keyboard_release(addr, k);
-            }
-            break;
-            
-        case SK_VOLUME_MUTE:
-            if (mode == KEY_PRESSED) {
-                hid_consumer_press(CONSUMER_MUTE);
-            } else {
-                keyboard_release(addr, k);
-            }
-            break;
-            
-        case SK_FN_LOCK_KEYBOARD:
-            if (mode == KEY_PRESSED) {
-                keyboard_state.lock = keyboard_state.lock ^ 1;
-            } else if (mode == KEY_RELEASED) {
-                // Clear the stored key so that the next press will work correctly
-                // (whether it's Escape without Fn, or _FN_LOCK_KEYBOARD with Fn)
-                keyboard_pick_map[addr] = 0;
-            }
-            break;
-            
-        case SK_FN_LIGHT_KEYBOARD:
-            if (mode == KEY_PRESSED) {
-                keyboard_state.backlight++;
-                if (keyboard_state.backlight >= 3) {
-                    keyboard_state.backlight = 0;
-                }
-                // PWM will be set in main loop
-            } else if (mode == KEY_RELEASED) {
-                // Clear the stored key so that the next press will work correctly
-                keyboard_pick_map[addr] = 0;
-            }
-            break;
-            
-        case SK_FN_KEY:
-            if (mode == KEY_PRESSED) {
-                // Sticky keys - currently not used/implemented
-                // if (keyboard_state.fn.lock == 0) {
-                    keyboard_state.fn_on = FN_LAYER;
-                    // keyboard_state.fn.begin = k;
-                // }
-            } else if (mode == KEY_RELEASED) {
-                keyboard_state.fn_on = 0;
-                // Sticky keys - currently not used/implemented
-                // keyboard_state.fn.begin = 0;
-                // keyboard_state.fn.time = 0;
-            }
-            break;
-            
-        default:
-            // All keys are now HID codes, no conversion needed
-            if (mode == KEY_PRESSED) {
-                hid_keyboard_press((uint8_t)k);
-            } else if (mode == KEY_RELEASED) {
-                keyboard_release(addr, k);
-            }
-            break;
-    }
-}
-
-static void keypad_release_core(uint16_t k)
-{
-    switch (k) {
-        case KEY_LEFT_SHIFT:
-        case KEY_RIGHT_SHIFT:
-            // Sticky keys - currently not used/implemented
-            // if (keyboard_state.shift.lock == 0) {
-                hid_keyboard_clear_modifier((uint8_t)k);
-                // keyboard_state.shift.begin = 0;
-                // keyboard_state.shift.time = 0;
-                keyboard_state.sf_on = 0;
-            // }
-            break;
-            
-        case SK_MOUSE_LEFT:
-            hid_mouse_release(MOUSE_LEFT);
-            break;
-            
-        case SK_MOUSE_MID:
-            hid_mouse_release(MOUSE_MIDDLE);
-            break;
-            
-        case SK_MOUSE_RIGHT:
-            hid_mouse_release(MOUSE_RIGHT);
-            break;
-            
-        case KEY_LEFT_CTRL:
-        case KEY_RIGHT_CTRL:
-            // Sticky keys - currently not used/implemented
-            // if (keyboard_state.ctrl.lock == 0) {
-                hid_keyboard_clear_modifier((uint8_t)k);  // Use clear_modifier for explicit modifier handling
-                // keyboard_state.ctrl.begin = 0;
-                // keyboard_state.ctrl.time = 0;
-            // }
-            break;
-            
-        case KEY_LEFT_ALT:
-        case KEY_RIGHT_ALT:
-            // Sticky keys - currently not used/implemented
-            // if (keyboard_state.alt.lock == 0) {
-                hid_keyboard_clear_modifier((uint8_t)k);  // Use clear_modifier for explicit modifier handling
-                // keyboard_state.alt.begin = 0;
-                // keyboard_state.alt.time = 0;
-            // }
-            break;
-            
-        case KEY_LEFT_GUI:
-        case KEY_RIGHT_GUI:
-            hid_keyboard_clear_modifier((uint8_t)k);  // Use clear_modifier for explicit modifier handling
-            break;
-            
-        default:
-            hid_keyboard_release(k);
-            break;
-    }
-}
-
-static void keypad_release(uint8_t addr, uint16_t k)
-{
-    if (keys_pick_map[addr] == 0) {
-        keypad_release_core(k);
-    } else {
-        keypad_release_core(keys_pick_map[addr]);
-        keys_pick_map[addr] = 0;
-    }
-}
-
-void keypad_action(uint8_t col, uint8_t mode)
-{
-    uint16_t k;
-    
-    if (keyboard_state.fn_on > 0) {
-        k = keys_maps[keyboard_state.fn_on][col];
-    } else {
-        k = keys_maps[keyboard_state.layer][col];
-    }
-    
-    if (k == EMP) {
-        return;
-    }
-    
-    if (keyboard_state.lock == 1) {
-        return;
-    }
-    
-    if (mode == KEY_PRESSED) {
-        if (keys_pick_map[col] == 0) {
-            keys_pick_map[col] = k;
-        }
-    }
-    
-    switch (k) {
-        case KEY_LEFT_SHIFT:
-        case KEY_RIGHT_SHIFT:
-            if (mode == KEY_PRESSED) {
-                // Sticky keys - currently not used/implemented
-                // if (keyboard_state.shift.lock == 0) {
-                    hid_keyboard_set_modifier((uint8_t)k);  // Use set_modifier for explicit modifier handling
-                    // keyboard_state.shift.begin = k;
-                    keyboard_state.sf_on = k;
-                // }
-            } else if (mode == KEY_RELEASED) {
-                keypad_release(col, k);
-            }
-            break;
-            
-        case SK_MOUSE_LEFT:
-            if (mode == KEY_PRESSED) {
-                hid_mouse_press(MOUSE_LEFT);
-            } else if (mode == KEY_RELEASED) {
-                keypad_release(col, k);
-            }
-            break;
-            
-        case SK_MOUSE_MID:
-            if (mode == KEY_PRESSED) {
-                hid_mouse_press(MOUSE_MIDDLE);
-            } else {
-                keypad_release(col, k);
-            }
-            break;
-            
-        case SK_MOUSE_RIGHT:
-            if (mode == KEY_PRESSED) {
-                hid_mouse_press(MOUSE_RIGHT);
-            } else if (mode == KEY_RELEASED) {
-                keypad_release(col, k);
-            }
-            break;
-            
-        case KEY_LEFT_CTRL:
-        case KEY_RIGHT_CTRL:
-            if (mode == KEY_PRESSED) {
-                // Sticky keys - currently not used/implemented
-                // if (keyboard_state.ctrl.lock == 0) {
-                    hid_keyboard_set_modifier((uint8_t)k);  // Use set_modifier for explicit modifier handling
-                    // keyboard_state.ctrl.begin = k;
-                // }
-            } else {
-                keypad_release(col, k);
-            }
-            break;
-            
-        case KEY_LEFT_ALT:
-        case KEY_RIGHT_ALT:
-            if (mode == KEY_PRESSED) {
-                // Sticky keys - currently not used/implemented
-                // if (keyboard_state.alt.lock == 0) {
-                    hid_keyboard_set_modifier((uint8_t)k);  // Use set_modifier for explicit modifier handling
-                    // keyboard_state.alt.begin = k;
-                // }
-            } else {
-                keypad_release(col, k);
-            }
-            break;
-            
-        case KEY_LEFT_GUI:
-        case KEY_RIGHT_GUI:
-            if (mode == KEY_PRESSED) {
-                hid_keyboard_set_modifier((uint8_t)k);  // Use set_modifier for explicit modifier handling
-            } else {
-                keypad_release(col, k);
-            }
-            break;
-            
-        case KEY_KEYPAD_ASTERISK:
-            // Check if Fn is pressed (Fn + * = bootloader)
-            if (mode == KEY_PRESSED && keyboard_state.fn_on > 0) {
-                // Jump to bootloader
-                jump_to_bootloader();
-            } else if (mode == KEY_PRESSED) {
-                // Normal keypad * key
-                hid_keyboard_press(KEY_KEYPAD_ASTERISK);
-            } else if (mode == KEY_RELEASED) {
-                keypad_release(col, k);
-            }
-            break;
-            
-        default:
-            // All keys are now HID codes, no conversion needed
-            if (mode == KEY_PRESSED) {
-                hid_keyboard_press((uint8_t)k);
-            } else if (mode == KEY_RELEASED) {
-                keypad_release(col, k);
-            }
-            break;
-    }
-}
-

@@ -1,4 +1,4 @@
-#include "keys.h"
+#include "keyboard_non_matrix.h"
 #include "keyboard_state.h"
 #include "keymaps.h"
 #include "main.h"
@@ -33,7 +33,7 @@ static uint8_t read_io(uint8_t idx)
     return (state == GPIO_PIN_RESET) ? 1 : 0; // Inverted because of pullup
 }
 
-uint8_t scan_keys(void)
+uint8_t scan_non_matrix(void)
 {
     uint32_t data = 0;
     uint8_t s;
@@ -58,9 +58,9 @@ uint8_t scan_keys(void)
     return 1;
 }
 
-void keys_task(void)
+void non_matrix_task(void)
 {
-    scan_keys();
+    scan_non_matrix();
     
     uint32_t mask = 1;
     uint32_t change = 0;
@@ -73,9 +73,9 @@ void keys_task(void)
             if (change & mask) {
                 pressed = keys & mask;
                 if (pressed) {
-                    keypad_action(c, KEY_PRESSED);
+                    non_matrix_action(c, KEY_PRESSED);
                 } else {
-                    keypad_action(c, KEY_RELEASED);
+                    non_matrix_action(c, KEY_RELEASED);
                 }
                 keys_prev ^= mask;
             }
@@ -83,7 +83,7 @@ void keys_task(void)
     }
 }
 
-void keys_init(void)
+void non_matrix_init(void)
 {
     // Keys are already configured as inputs with pullup in MX_GPIO_Init
     keypad_debouncing.deing = false;

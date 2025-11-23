@@ -39,8 +39,8 @@ C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/stm32f1xx_it.c \
 Core/Src/stm32f1xx_hal_msp.c \
-Core/Src/keyboard.c \
-Core/Src/keys.c \
+Core/Src/keyboard_matrix.c \
+Core/Src/keyboard_non_matrix.c \
 Core/Src/keymaps.c \
 Core/Src/trackball.c \
 Core/Src/hid_keyboard.c \

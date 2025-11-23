@@ -141,7 +141,7 @@ void trackball_task(void)
     
     __disable_irq();
     // Use fn_on instead of select_on for wheel mode (Fn + trackball)
-    asWheel = keyboard_state.fn_on > 0;
+    asWheel = keyboard_state.layer > 0;
     
     // Reset wheel buffers only when switching modes
     if (asWheel != lastWheelMode) {

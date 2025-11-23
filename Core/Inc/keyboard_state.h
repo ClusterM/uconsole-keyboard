@@ -18,19 +18,9 @@ typedef struct {
 
 typedef struct {
     uint8_t layer;
-    uint8_t prev_layer;
-    uint8_t fn_on;
-    uint8_t select_on;
-    uint16_t sf_on;
-    
+    uint16_t mod_keys_on;
     uint8_t backlight;
     uint8_t lock;
-    
-    // Sticky keys functionality - currently not used/implemented
-    // KEYBOARD_LOCK ctrl;
-    // KEYBOARD_LOCK shift;
-    // KEYBOARD_LOCK alt;
-    // KEYBOARD_LOCK fn;
 } KEYBOARD_STATE;
 
 extern KEYBOARD_STATE keyboard_state;

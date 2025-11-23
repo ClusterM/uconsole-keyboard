@@ -1,4 +1,4 @@
-#include "keyboard.h"
+#include "keyboard_matrix.h"
 #include "keyboard_state.h"
 #include "keymaps.h"
 #include "main.h"
@@ -61,7 +61,7 @@ void matrix_init(void)
     HAL_Delay(500);
 }
 
-uint8_t matrix_scan(void)
+static uint8_t matrix_scan(void)
 {
     uint8_t data;
     
@@ -128,18 +128,18 @@ static uint8_t matrix_get_row(uint8_t row)
 static void matrix_press(uint8_t row, uint8_t col)
 {
     if (matrix_is_on(row, col) == true) {
-        keyboard_action(row, col, KEY_PRESSED);
+        matrix_action(row, col, KEY_PRESSED);
     }
 }
 
 static void matrix_release(uint8_t row, uint8_t col)
 {
     if (matrix_is_on(row, col) == false) {
-        keyboard_action(row, col, KEY_RELEASED);
+        matrix_action(row, col, KEY_RELEASED);
     }
 }
 
-void keyboard_task(void)
+void matrix_task(void)
 {
     uint8_t matrix_row = 0;
     uint8_t matrix_change = 0;
@@ -166,9 +166,3 @@ void keyboard_task(void)
         }
     }
 }
-
-void keyboard_init(void)
-{
-    matrix_init();
-}
-
