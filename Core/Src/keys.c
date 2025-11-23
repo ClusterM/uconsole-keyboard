@@ -12,19 +12,19 @@ KEY_DEB keypad_debouncing;
 
 // Pin definitions for keys
 static const GPIO_TypeDef* keys_port[KEYS_NUM] = {
-    KEY1_GPIO_Port, KEY2_GPIO_Port, KEY3_GPIO_Port, KEY4_GPIO_Port,
-    KEY5_GPIO_Port, KEY6_GPIO_Port, KEY7_GPIO_Port, KEY8_GPIO_Port,
-    KEY9_GPIO_Port, KEY10_GPIO_Port, KEY11_GPIO_Port, KEY12_GPIO_Port,
-    KEY13_GPIO_Port, KEY14_GPIO_Port, KEY15_GPIO_Port, KEY16_GPIO_Port,
-    KEY1_GPIO_Port  // KEY0 - using KEY1 port for now, need to check actual pin
+    KEY0_GPIO_Port, KEY1_GPIO_Port, KEY2_GPIO_Port, KEY3_GPIO_Port,
+    KEY4_GPIO_Port, KEY5_GPIO_Port, KEY6_GPIO_Port, KEY7_GPIO_Port,
+    KEY8_GPIO_Port, KEY9_GPIO_Port, KEY10_GPIO_Port, KEY11_GPIO_Port,
+    KEY12_GPIO_Port, KEY13_GPIO_Port, KEY14_GPIO_Port, KEY15_GPIO_Port,
+    KEY16_GPIO_Port
 };
 
 static const uint16_t keys_pin[KEYS_NUM] = {
-    KEY1_Pin, KEY2_Pin, KEY3_Pin, KEY4_Pin,
-    KEY5_Pin, KEY6_Pin, KEY7_Pin, KEY8_Pin,
-    KEY9_Pin, KEY10_Pin, KEY11_Pin, KEY12_Pin,
-    KEY13_Pin, KEY14_Pin, KEY15_Pin, KEY16_Pin,
-    KEY1_Pin  // KEY0
+    KEY0_Pin, KEY1_Pin, KEY2_Pin, KEY3_Pin, 
+    KEY4_Pin, KEY5_Pin, KEY6_Pin, KEY7_Pin,
+    KEY8_Pin, KEY9_Pin, KEY10_Pin, KEY11_Pin,
+    KEY12_Pin, KEY13_Pin, KEY14_Pin, KEY15_Pin,
+    KEY16_Pin
 };
 
 static uint8_t read_io(uint8_t idx)

@@ -34,19 +34,43 @@ const uint16_t keyboard_maps[][MATRIX_KEYS] = {
 
 const uint16_t keys_maps[][KEYS_NUM] = {
     [DEF_LAYER] = {
-        KEY_UP_ARROW, KEY_DOWN_ARROW, KEY_LEFT_ARROW, KEY_RIGHT_ARROW,
-        KEY_KEYPAD_PLUS, KEY_KEYPAD_MINUS, KEY_KEYPAD_ASTERISK, KEY_KEYPAD_SLASH, // Y, X, B, A -> +, -, *, /
-        KEY_LEFT_SHIFT, KEY_RIGHT_SHIFT, KEY_LEFT_CTRL, KEY_RIGHT_CTRL,
-        KEY_LEFT_ALT, _MOUSE_LEFT, KEY_RIGHT_ALT, _MOUSE_RIGHT,
-        _TRACKBALL_BTN
+        _MOUSE_MID,             // Trackball button
+        KEY_UP_ARROW,           // Up
+        KEY_DOWN_ARROW,         // Down
+        KEY_LEFT_ARROW,         // Left
+        KEY_RIGHT_ARROW,        // Right
+        KEY_KEYPAD_PLUS,        // Gamepad Y
+        KEY_KEYPAD_MINUS,       // Gamepad X
+        KEY_KEYPAD_ASTERISK,    // Gamepad B
+        KEY_KEYPAD_SLASH,       // Gamepad A
+        KEY_LEFT_SHIFT,         // Left shift
+        KEY_RIGHT_SHIFT,       // Right shift
+        KEY_LEFT_CTRL,         // Left ctrl
+        KEY_RIGHT_CTRL,        // Right ctrl
+        KEY_LEFT_ALT,          // Left alt
+        _MOUSE_LEFT,           // Gamepad L
+         KEY_RIGHT_ALT,        // Right alt
+         _MOUSE_RIGHT          // Gamepad R
     },
     
     [FN_LAYER] = {
-        KEY_PAGE_UP, KEY_PAGE_DOWN, KEY_HOME, KEY_END,
-        KEY_KEYPAD_PLUS, KEY_KEYPAD_MINUS, KEY_KEYPAD_ASTERISK, KEY_KEYPAD_SLASH, // Y, X, B, A -> +, -, *, /
-        _FN_SHIFT, _FN_SHIFT, KEY_LEFT_CTRL, KEY_RIGHT_CTRL,
-        KEY_RIGHT_GUI, _MOUSE_LEFT, KEY_RIGHT_ALT, _MOUSE_RIGHT,
-        _TRACKBALL_BTN
+        _MOUSE_MID,             // Trackball button
+        KEY_PAGE_UP,            // Up
+        KEY_PAGE_DOWN,          // Down
+        KEY_HOME,               // Left
+        KEY_END,                // Right
+        KEY_KEYPAD_PLUS,        // Gamepad Y
+        KEY_KEYPAD_MINUS,       // Gamepad X
+        KEY_KEYPAD_ASTERISK,    // Gamepad B
+        KEY_KEYPAD_SLASH,       // Gamepad A
+        KEY_LEFT_SHIFT,         // Left shift
+        KEY_RIGHT_SHIFT,       // Right shift
+        KEY_LEFT_CTRL,         // Left ctrl
+        KEY_RIGHT_CTRL,        // Right ctrl
+        KEY_LEFT_GUI,          // Left alt
+        _MOUSE_LEFT,           // Gamepad L
+        KEY_RIGHT_ALT,         // Right alt
+        _MOUSE_RIGHT           // Gamepad R
     }
 };
 
@@ -292,9 +316,6 @@ void keyboard_action(uint8_t row, uint8_t col, uint8_t mode)
 static void keypad_release_core(uint16_t k)
 {
     switch (k) {
-        case _FN_SHIFT:
-            break;
-            
         case KEY_LEFT_SHIFT:
         case KEY_RIGHT_SHIFT:
             // Sticky keys - currently not used/implemented
@@ -343,10 +364,6 @@ static void keypad_release_core(uint16_t k)
             hid_keyboard_clear_modifier((uint8_t)k);  // Use clear_modifier for explicit modifier handling
             break;
             
-        case _TRACKBALL_BTN:
-            hid_mouse_release(MOUSE_MIDDLE);
-            break;
-            
         default:
             hid_keyboard_release(k);
             break;
@@ -388,10 +405,6 @@ void keypad_action(uint8_t col, uint8_t mode)
     }
     
     switch (k) {
-        case _FN_SHIFT:
-            keypad_release(col, k);
-            break;
-            
         case KEY_LEFT_SHIFT:
         case KEY_RIGHT_SHIFT:
             if (mode == KEY_PRESSED) {

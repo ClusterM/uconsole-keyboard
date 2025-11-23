@@ -125,6 +125,8 @@ void Error_Handler(void);
 #define HO_LEFT_Pin GPIO_PIN_11
 #define HO_LEFT_GPIO_Port GPIOC
 #define HO_LEFT_EXTI_IRQn EXTI15_10_IRQn
+#define KEY0_Pin GPIO_PIN_12
+#define KEY0_GPIO_Port GPIOC
 #define KEY4_Pin GPIO_PIN_3
 #define KEY4_GPIO_Port GPIOB
 #define KEY5_Pin GPIO_PIN_4
