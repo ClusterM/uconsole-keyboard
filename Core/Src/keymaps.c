@@ -53,8 +53,6 @@ const uint16_t keys_maps[][KEYS_NUM] = {
 static uint16_t keyboard_pick_map[MATRIX_KEYS] = {0};
 static uint16_t keys_pick_map[KEYS_NUM] = {0};
 
-const uint16_t backlight_vals[3] = {0, 500, 2000};
-
 /**
   * @brief  Reset to bootloader via watchdog
   * @retval None (never returns)

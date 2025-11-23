@@ -219,7 +219,19 @@ clean:
 # flash the device
 #######################################
 flash: $(BUILD_DIR)/$(TARGET).bin
-	dfu-util -d 1EAF:0003 -a 2 -D $(BUILD_DIR)/$(TARGET).bin
+	@echo "Press Fn+X(on gamepad) to enter DFU mode"
+	@TIMEOUT=30; \
+	while ! lsusb | grep -q "1eaf:0003"; do \
+		echo -n "."; \
+		sleep 1; \
+		TIMEOUT=$$((TIMEOUT - 1)); \
+		if [ $$TIMEOUT -eq 0 ]; then \
+			echo "Timeout waiting for DFU mode"; \
+			exit 1; \
+		fi; \
+	done
+	echo
+	sudo dfu-util -d 1EAF:0003 -a 2 -D $(BUILD_DIR)/$(TARGET).bin || true
   
 #######################################
 # dependencies
