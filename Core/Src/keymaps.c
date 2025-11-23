@@ -8,58 +8,26 @@
 
 KEYBOARD_STATE keyboard_state;
 
-// Character to HID key code mapping
-static uint8_t char_to_hid(uint8_t c)
-{
-    // Lowercase letters
-    if (c >= 'a' && c <= 'z') {
-        return 0x04 + (c - 'a');
-    }
-    // Numbers
-    if (c >= '1' && c <= '9') {
-        return 0x1E + (c - '1');
-    }
-    if (c == '0') {
-        return 0x27;
-    }
-    // Special characters
-    switch (c) {
-        case ' ': return 0x2C;
-        case '-': return 0x2D;
-        case '=': return 0x2E;
-        case '[': return 0x2F;
-        case ']': return 0x30;
-        case '\\': return 0x31;
-        case ';': return 0x33;
-        case '\'': return 0x34;
-        case '`': return 0x35;
-        case ',': return 0x36;
-        case '.': return 0x37;
-        case '/': return 0x38;
-        default: return c;
-    }
-}
-
 const uint16_t keyboard_maps[][MATRIX_KEYS] = {
     [DEF_LAYER] = {
-        _SELECT_KEY, _START_KEY, _VOLUME_M, '`', '[', ']', '-', '=',
-        '1', '2', '3', '4', '5', '6', '7', '8',
-        '9', '0', KEY_ESC, KEY_TAB, EMP, EMP, EMP, EMP,
-        'q', 'w', 'e', 'r', 't', 'y', 'u', 'i',
-        'o', 'p', 'a', 's', 'd', 'f', 'g', 'h',
-        'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b',
-        'n', 'm', ',', '.', '/', '\\', ';', '\'',
-        KEY_BACKSPACE, KEY_RETURN, _FN_KEY, _FN_KEY, ' ', EMP, EMP, EMP
+        _SELECT_KEY, _START_KEY, _VOLUME_M, KEY_GRAVE, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_MINUS, KEY_EQUAL,
+        KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8,
+        KEY_9, KEY_0, KEY_ESC, KEY_TAB, EMP, EMP, EMP, EMP,
+        KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_U, KEY_I,
+        KEY_O, KEY_P, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_H,
+        KEY_J, KEY_K, KEY_L, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,
+        KEY_N, KEY_M, KEY_COMMA, KEY_DOT, KEY_SLASH, KEY_BACKSLASH, KEY_SEMICOLON, KEY_APOSTROPHE,
+        KEY_BACKSPACE, KEY_RETURN, _FN_KEY, _FN_KEY, KEY_SPACE, EMP, EMP, EMP
     },
     
     [FN_LAYER] = {
-        KEY_PRNT_SCRN, KEY_PAUSE, _VOLUME_MUTE, '`', '[', ']', KEY_F11, KEY_F12,
+        KEY_PRNT_SCRN, KEY_PAUSE, _VOLUME_MUTE, KEY_GRAVE, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_F11, KEY_F12,
         KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8,
         KEY_F9, KEY_F10, _FN_LOCK_KEYBOARD, KEY_CAPS_LOCK, EMP, EMP, EMP, EMP,
-        'q', 'w', 'e', 'r', 't', 'y', KEY_PAGE_UP, KEY_INSERT,
-        'o', 'p', 'a', 's', 'd', 'f', 'g', KEY_HOME,
-        KEY_END, KEY_PAGE_DOWN, 'l', 'z', 'x', 'c', 'v', 'b',
-        'n', 'm', _FN_BRIGHTNESS_DOWN, _FN_BRIGHTNESS_UP, '/', '\\', ';', '\'',
+        KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_PAGE_UP, KEY_INSERT,
+        KEY_O, KEY_P, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_HOME,
+        KEY_END, KEY_PAGE_DOWN, KEY_L, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,
+        KEY_N, KEY_M, _FN_BRIGHTNESS_DOWN, _FN_BRIGHTNESS_UP, KEY_SLASH, KEY_BACKSLASH, KEY_SEMICOLON, KEY_APOSTROPHE,
         KEY_DELETE, KEY_RETURN, _FN_KEY, _FN_KEY, _FN_LIGHT_KEYBOARD, EMP, EMP, EMP
     }
 };
@@ -100,13 +68,6 @@ static void jump_to_bootloader(void)
     while (1);  
 }
 
-static uint8_t char_to_hid_release(uint16_t k)
-{
-    if (k < 128) {
-        return char_to_hid((uint8_t)k);
-    }
-    return (uint8_t)k;
-}
 
 
 static void keyboard_release_core(uint16_t k)
@@ -125,11 +86,28 @@ static void keyboard_release_core(uint16_t k)
             break;
             
         case _FN_BRIGHTNESS_UP:
+            hid_consumer_release(CONSUMER_BRIGHTNESS_UP);
+            break;
+            
         case _FN_BRIGHTNESS_DOWN:
+            hid_consumer_release(CONSUMER_BRIGHTNESS_DOWN);
+            break;
+            
         case _VOLUME_P:
+            hid_consumer_release(CONSUMER_VOLUME_UP);
+            break;
+            
         case _VOLUME_M:
+            // This can be either VOLUME_UP (with Shift) or VOLUME_DOWN (without Shift)
+            // We need to release the one that was actually pressed
+            // Since we don't track which one was pressed here, release both
+            // (only the one that was actually pressed will have an effect)
+            hid_consumer_release(CONSUMER_VOLUME_UP);
+            hid_consumer_release(CONSUMER_VOLUME_DOWN);
+            break;
+            
         case _VOLUME_MUTE:
-            hid_consumer_release();
+            hid_consumer_release(CONSUMER_MUTE);
             break;
             
         case _FN_KEY:
@@ -139,7 +117,12 @@ static void keyboard_release_core(uint16_t k)
             break;
             
         default:
-            hid_keyboard_release(char_to_hid_release(k));
+            // All keys are now HID codes (or special constants >= 0x100)
+            // For regular HID codes (< 0x100), release directly
+            // For special constants (>= 0x100), they should be handled above
+            if (k < 0x100) {
+                hid_keyboard_release((uint8_t)k);
+            }
             break;
     }
 }
@@ -147,10 +130,13 @@ static void keyboard_release_core(uint16_t k)
 static void keyboard_release(uint8_t addr, uint16_t k)
 {
     if (keyboard_pick_map[addr] == 0) {
+        // No stored value, use provided HID code
         keyboard_release_core(k);
     } else {
-        keyboard_release_core(keyboard_pick_map[addr]);
+        // Use stored value (already HID code)
+        uint16_t stored_key = keyboard_pick_map[addr];
         keyboard_pick_map[addr] = 0;
+        keyboard_release_core(stored_key);
     }
 }
 
@@ -175,6 +161,7 @@ void keyboard_action(uint8_t row, uint8_t col, uint8_t mode)
     
     if (mode == KEY_PRESSED) {
         if (keyboard_pick_map[addr] == 0) {
+            // Store key code (all keys are now HID codes, no ASCII conflicts)
             keyboard_pick_map[addr] = k;
         }
     }
@@ -229,10 +216,15 @@ void keyboard_action(uint8_t row, uint8_t col, uint8_t mode)
         case _VOLUME_M:
             if (mode == KEY_PRESSED) {
                 if (keyboard_state.sf_on > 0) {
-                    hid_keyboard_release(KEY_LEFT_SHIFT);
-                    hid_keyboard_release(KEY_RIGHT_SHIFT);
+                    // Shift was pressed - increase volume
+                    // Release both shifts in HID report (so they don't affect other keys)
+                    // But keep sf_on set (so subsequent presses will also increase volume)
+                    // Release both shifts in one operation to avoid overwriting reports
+                    // hid_keyboard_release_both_shifts() already waits for USB idle
+                    hid_keyboard_release_both_shifts();
                     hid_consumer_press(CONSUMER_VOLUME_UP);
                 } else {
+                    // No shift - decrease volume
                     hid_consumer_press(CONSUMER_VOLUME_DOWN);
                 }
             } else {
@@ -278,13 +270,11 @@ void keyboard_action(uint8_t row, uint8_t col, uint8_t mode)
             break;
             
         default:
+            // All keys are now HID codes, no conversion needed
             if (mode == KEY_PRESSED) {
-                // Convert character to HID code if needed
-                uint8_t hid_code = (k < 128) ? char_to_hid(k) : k;
-                hid_keyboard_press(hid_code);
+                hid_keyboard_press((uint8_t)k);
             } else if (mode == KEY_RELEASED) {
-                uint8_t hid_code = (k < 128) ? char_to_hid(k) : k;
-                keyboard_release(addr, hid_code);
+                keyboard_release(addr, k);
             }
             break;
     }
@@ -480,10 +470,9 @@ void keypad_action(uint8_t col, uint8_t mode)
             break;
             
         default:
+            // All keys are now HID codes, no conversion needed
             if (mode == KEY_PRESSED) {
-                // Convert character to HID code if needed
-                uint8_t hid_code = (k < 128) ? char_to_hid(k) : k;
-                hid_keyboard_press(hid_code);
+                hid_keyboard_press((uint8_t)k);
             } else if (mode == KEY_RELEASED) {
                 keypad_release(col, k);
             }
