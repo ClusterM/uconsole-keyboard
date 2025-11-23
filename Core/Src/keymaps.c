@@ -45,7 +45,7 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_PAGE_UP, KEY_PAGE_DOWN, KEY_HOME, KEY_END,
         KEY_KEYPAD_PLUS, KEY_KEYPAD_MINUS, KEY_KEYPAD_ASTERISK, KEY_KEYPAD_SLASH, // Y, X, B, A -> +, -, *, /
         _FN_SHIFT, _FN_SHIFT, KEY_LEFT_CTRL, KEY_RIGHT_CTRL,
-        KEY_RIGHT_GUI, _MOUSE_LEFT, KEY_RIGHT_ALT, _MOUSE_RIGHT,
+        KEY_LEFT_GUI, _MOUSE_LEFT, KEY_RIGHT_ALT, _MOUSE_RIGHT,
         _TRACKBALL_BTN
     }
 };
@@ -311,7 +311,7 @@ static void keypad_release_core(uint16_t k)
         case KEY_LEFT_CTRL:
         case KEY_RIGHT_CTRL:
             if (keyboard_state.ctrl.lock == 0) {
-                hid_keyboard_release(k);
+                hid_keyboard_clear_modifier((uint8_t)k);  // Use clear_modifier for explicit modifier handling
                 keyboard_state.ctrl.begin = 0;
                 keyboard_state.ctrl.time = 0;
             }
@@ -320,14 +320,15 @@ static void keypad_release_core(uint16_t k)
         case KEY_LEFT_ALT:
         case KEY_RIGHT_ALT:
             if (keyboard_state.alt.lock == 0) {
-                hid_keyboard_release(k);
+                hid_keyboard_clear_modifier((uint8_t)k);  // Use clear_modifier for explicit modifier handling
                 keyboard_state.alt.begin = 0;
                 keyboard_state.alt.time = 0;
             }
             break;
             
+        case KEY_LEFT_GUI:
         case KEY_RIGHT_GUI:
-            hid_keyboard_release(k);
+            hid_keyboard_clear_modifier((uint8_t)k);  // Use clear_modifier for explicit modifier handling
             break;
             
         case _TRACKBALL_BTN:
@@ -383,7 +384,7 @@ void keypad_action(uint8_t col, uint8_t mode)
         case KEY_RIGHT_SHIFT:
             if (mode == KEY_PRESSED) {
                 if (keyboard_state.shift.lock == 0) {
-                    hid_keyboard_press(k);
+                    hid_keyboard_set_modifier((uint8_t)k);  // Use set_modifier for explicit modifier handling
                     keyboard_state.shift.begin = k;
                     keyboard_state.sf_on = k;
                 }
@@ -420,7 +421,7 @@ void keypad_action(uint8_t col, uint8_t mode)
         case KEY_RIGHT_CTRL:
             if (mode == KEY_PRESSED) {
                 if (keyboard_state.ctrl.lock == 0) {
-                    hid_keyboard_press(k);
+                    hid_keyboard_set_modifier((uint8_t)k);  // Use set_modifier for explicit modifier handling
                     keyboard_state.ctrl.begin = k;
                 }
             } else {
@@ -432,7 +433,7 @@ void keypad_action(uint8_t col, uint8_t mode)
         case KEY_RIGHT_ALT:
             if (mode == KEY_PRESSED) {
                 if (keyboard_state.alt.lock == 0) {
-                    hid_keyboard_press(k);
+                    hid_keyboard_set_modifier((uint8_t)k);  // Use set_modifier for explicit modifier handling
                     keyboard_state.alt.begin = k;
                 }
             } else {
@@ -440,9 +441,10 @@ void keypad_action(uint8_t col, uint8_t mode)
             }
             break;
             
+        case KEY_LEFT_GUI:
         case KEY_RIGHT_GUI:
             if (mode == KEY_PRESSED) {
-                hid_keyboard_press(k);
+                hid_keyboard_set_modifier((uint8_t)k);  // Use set_modifier for explicit modifier handling
             } else {
                 keypad_release(col, k);
             }

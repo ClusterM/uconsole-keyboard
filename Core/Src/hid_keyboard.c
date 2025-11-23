@@ -23,26 +23,11 @@ int8_t hid_keyboard_clear_modifier(uint8_t modifier_bit)
 
 int8_t hid_keyboard_press(uint8_t key)
 {
-    switch (key) {
-        case KEY_LEFT_CTRL:
-        case KEY_LEFT_SHIFT:
-        case KEY_LEFT_ALT:
-        case KEY_LEFT_GUI:
-        case KEY_RIGHT_CTRL:
-        case KEY_RIGHT_SHIFT:
-        case KEY_RIGHT_ALT:
-        case KEY_RIGHT_GUI:
-            keyboard_report[1] |= key;
+    for (int i = 3; i < 9; i++) {
+        if (keyboard_report[i] == 0) {
+            keyboard_report[i] = key;
             break;
-        default:
-            // Regular keys
-            for (int i = 3; i < 9; i++) {
-                if (keyboard_report[i] == 0) {
-                    keyboard_report[i] = key;
-                    break;
-                }
-            }
-            break;
+        }
     }
     
     int8_t result = USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, keyboard_report, 9);
@@ -52,26 +37,11 @@ int8_t hid_keyboard_press(uint8_t key)
 
 int8_t hid_keyboard_release(uint8_t key)
 {
-    switch (key) {
-        case KEY_LEFT_CTRL:
-        case KEY_LEFT_SHIFT:
-        case KEY_LEFT_ALT:
-        case KEY_LEFT_GUI:
-        case KEY_RIGHT_CTRL:
-        case KEY_RIGHT_SHIFT:
-        case KEY_RIGHT_ALT:
-        case KEY_RIGHT_GUI:
-            keyboard_report[1] &= ~key;
+    for (int i = 3; i < 9; i++) {
+        if (keyboard_report[i] == key) {
+            keyboard_report[i] = 0;
             break;
-        default:
-            // Regular keys
-            for (int i = 3; i < 9; i++) {
-                if (keyboard_report[i] == key) {
-                    keyboard_report[i] = 0;
-                    break;
-                }
-            }
-            break;
+        }
     }
     
     int8_t result = USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, keyboard_report, 9);
