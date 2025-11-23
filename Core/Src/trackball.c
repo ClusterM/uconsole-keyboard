@@ -21,6 +21,7 @@ static volatile int8_t distances[AXIS_NUM];
 static RateMeter rateMeter[AXIS_NUM];
 static Glider glider[AXIS_NUM];
 static int8_t wheelBuffer;
+static int8_t hWheelBuffer;  // Horizontal wheel buffer
 static bool asWheel = false;
 static bool lastWheelMode = false;
 
@@ -142,20 +143,27 @@ void trackball_task(void)
     // Use fn_on instead of select_on for wheel mode (Fn + trackball)
     asWheel = keyboard_state.fn_on > 0;
     
-    // Reset wheel buffer only when switching modes
+    // Reset wheel buffers only when switching modes
     if (asWheel != lastWheelMode) {
         if (asWheel) {
             ratemeter_expire(&rateMeter[AXIS_X]);
             ratemeter_expire(&rateMeter[AXIS_Y]);
             wheelBuffer = 0;
+            hWheelBuffer = 0;
         }
         lastWheelMode = asWheel;
     }
     
     if (asWheel) {
+        // Vertical scroll (wheel) - Y axis
         wheelBuffer += distances[AXIS_Y];
         w = wheelBuffer / WHEEL_DENOM;
         wheelBuffer -= w * WHEEL_DENOM;
+        
+        // Horizontal scroll (pan) - X axis
+        hWheelBuffer += distances[AXIS_X];
+        x = 0;  // No X movement in wheel mode
+        y = 0;  // No Y movement in wheel mode
     } else {
         ratemeter_tick(&rateMeter[AXIS_X], delta);
         ratemeter_tick(&rateMeter[AXIS_Y], delta);
@@ -175,8 +183,20 @@ void trackball_task(void)
     distances[AXIS_Y] = 0;
     __enable_irq();
     
-    if (x != 0 || y != 0 || w != 0) {
-        hid_mouse_move(x, y, -w);
+    if (asWheel) {
+        // In wheel mode, use pan for horizontal scroll
+        int8_t hw = 0;
+        if (hWheelBuffer != 0) {
+            hw = hWheelBuffer / WHEEL_DENOM;
+            hWheelBuffer -= hw * WHEEL_DENOM;
+        }
+        if (w != 0 || hw != 0) {
+            hid_mouse_move_with_pan(0, 0, -w, hw);  // Invert horizontal scroll direction
+        }
+    } else {
+        if (x != 0 || y != 0 || w != 0) {
+            hid_mouse_move(x, y, -w);
+        }
     }
 }
 
@@ -191,6 +211,7 @@ void trackball_init(void)
     distances[AXIS_X] = 0;
     distances[AXIS_Y] = 0;
     wheelBuffer = 0;
+    hWheelBuffer = 0;
     asWheel = false;
     lastWheelMode = false;
 }
