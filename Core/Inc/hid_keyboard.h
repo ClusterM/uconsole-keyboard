@@ -1,22 +1,21 @@
 #ifndef HID_KEYBOARD_H
 #define HID_KEYBOARD_H
 
+#include "main.h"
 #include <stdint.h>
 #include "usbd_custom_hid_if.h"
 
 /* HID Keyboard key codes */
 
-#define MODIFIER_FLAG 0x1000
-
-// Modifier keys, internal codes, real are & ~0x1000
-#define KEY_LEFT_CTRL      (MODIFIER_FLAG | 0x01)
-#define KEY_LEFT_SHIFT     (MODIFIER_FLAG | 0x02)
-#define KEY_LEFT_ALT       (MODIFIER_FLAG | 0x04)
-#define KEY_LEFT_GUI       (MODIFIER_FLAG | 0x08)
-#define KEY_RIGHT_CTRL     (MODIFIER_FLAG | 0x10)
-#define KEY_RIGHT_SHIFT    (MODIFIER_FLAG | 0x20)
-#define KEY_RIGHT_ALT      (MODIFIER_FLAG | 0x40)
-#define KEY_RIGHT_GUI      (MODIFIER_FLAG | 0x80)
+// Modifier keys
+#define KEY_LEFT_CTRL      (MODIFIER_KEY_FLAG | 0x01)
+#define KEY_LEFT_SHIFT     (MODIFIER_KEY_FLAG | 0x02)
+#define KEY_LEFT_ALT       (MODIFIER_KEY_FLAG | 0x04)
+#define KEY_LEFT_GUI       (MODIFIER_KEY_FLAG | 0x08)
+#define KEY_RIGHT_CTRL     (MODIFIER_KEY_FLAG | 0x10)
+#define KEY_RIGHT_SHIFT    (MODIFIER_KEY_FLAG | 0x20)
+#define KEY_RIGHT_ALT      (MODIFIER_KEY_FLAG | 0x40)
+#define KEY_RIGHT_GUI      (MODIFIER_KEY_FLAG | 0x80)
 
 // Letter keys
 #define KEY_A              0x04
