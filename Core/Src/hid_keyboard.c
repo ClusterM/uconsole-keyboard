@@ -5,7 +5,7 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 
 static uint8_t keyboard_report[9] = {0x01, 0, 0, 0, 0, 0, 0, 0, 0}; // Report ID 1 + 8 bytes data
 
-int8_t hid_keyboard_set_modifier(uint8_t modifier_bit)
+static int8_t hid_keyboard_set_modifier(uint8_t modifier_bit)
 {
     keyboard_report[1] |= modifier_bit;
     int8_t result = USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, keyboard_report, 9);
@@ -13,7 +13,7 @@ int8_t hid_keyboard_set_modifier(uint8_t modifier_bit)
     return result;
 }
 
-int8_t hid_keyboard_clear_modifier(uint8_t modifier_bit)
+static int8_t hid_keyboard_clear_modifier(uint8_t modifier_bit)
 {
     keyboard_report[1] &= ~modifier_bit;
     int8_t result = USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, keyboard_report, 9);
@@ -21,7 +21,16 @@ int8_t hid_keyboard_clear_modifier(uint8_t modifier_bit)
     return result;
 }
 
-int8_t hid_keyboard_press(uint8_t key)
+int8_t hid_keyboard_modifier(uint8_t modifier_bit, uint8_t mode)
+{
+    if (mode == KEY_PRESSED) {
+        return hid_keyboard_set_modifier(modifier_bit);
+    } else {
+        return hid_keyboard_clear_modifier(modifier_bit);
+    }
+}
+
+static int8_t hid_keyboard_press(uint8_t key)
 {
     for (int i = 3; i < 9; i++) {
         if (keyboard_report[i] == 0) {
@@ -35,7 +44,7 @@ int8_t hid_keyboard_press(uint8_t key)
     return result;
 }
 
-int8_t hid_keyboard_release(uint8_t key)
+static int8_t hid_keyboard_release(uint8_t key)
 {
     for (int i = 3; i < 9; i++) {
         if (keyboard_report[i] == key) {
@@ -49,6 +58,15 @@ int8_t hid_keyboard_release(uint8_t key)
     return result;
 }
 
+int8_t hid_keyboard_button(uint8_t key, uint8_t mode)
+{
+    if (mode == KEY_PRESSED) {
+        return hid_keyboard_press(key);
+    } else {
+        return hid_keyboard_release(key);
+    }
+}
+
 int8_t hid_keyboard_release_all(void)
 {
     keyboard_report[0] = 0x01; // Report ID
@@ -56,16 +74,6 @@ int8_t hid_keyboard_release_all(void)
         keyboard_report[i] = 0;
     }
     
-    int8_t result = USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, keyboard_report, 9);
-    hid_wait_for_usb_idle();
-    return result;
-}
-
-int8_t hid_keyboard_release_both_shifts(void)
-{
-    // Clear both shift bits in one operation
-    keyboard_report[1] &= ~(KEY_LEFT_SHIFT | KEY_RIGHT_SHIFT);
-    // Send report once
     int8_t result = USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, keyboard_report, 9);
     hid_wait_for_usb_idle();
     return result;

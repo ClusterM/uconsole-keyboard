@@ -13,15 +13,6 @@
 #   define DEBOUNCE 20
 #endif
 
-#define KEY_PRESSED 1
-#define KEY_RELEASED 0
-
-#define KEY_PRNT_SCRN 0xCE
-#define KEY_PAUSE  0xd0
-
-#define KEY_VOLUME_UP 0x108
-#define KEY_VOLUME_DOWN 0x109
-
 void matrix_init(void);
 void matrix_task(void);
 

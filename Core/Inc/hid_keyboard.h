@@ -4,33 +4,19 @@
 #include <stdint.h>
 #include "usbd_custom_hid_if.h"
 
-// HID Keyboard key codes
+/* HID Keyboard key codes */
+
+#define MODIFIER_FLAG 0x1000
 
 // Modifier keys, internal codes, real are & ~0x1000
-#define KEY_LEFT_CTRL      0x1001
-#define KEY_LEFT_SHIFT     0x1002
-#define KEY_LEFT_ALT       0x1004
-#define KEY_LEFT_GUI       0x1008
-#define KEY_RIGHT_CTRL     0x1010
-#define KEY_RIGHT_SHIFT    0x1020
-#define KEY_RIGHT_ALT      0x1040
-#define KEY_RIGHT_GUI      0x1080
-
-#define KEY_UP_ARROW       0x52
-#define KEY_DOWN_ARROW     0x51
-#define KEY_LEFT_ARROW     0x50
-#define KEY_RIGHT_ARROW    0x4F
-#define KEY_BACKSPACE      0x2A
-#define KEY_TAB            0x2B
-#define KEY_RETURN         0x28
-#define KEY_ESC            0x29
-#define KEY_INSERT         0x49
-#define KEY_DELETE         0x4C
-#define KEY_PAGE_UP        0x4B
-#define KEY_PAGE_DOWN      0x4E
-#define KEY_HOME           0x4A
-#define KEY_END            0x4D
-#define KEY_CAPS_LOCK      0x39
+#define KEY_LEFT_CTRL      (MODIFIER_FLAG | 0x01)
+#define KEY_LEFT_SHIFT     (MODIFIER_FLAG | 0x02)
+#define KEY_LEFT_ALT       (MODIFIER_FLAG | 0x04)
+#define KEY_LEFT_GUI       (MODIFIER_FLAG | 0x08)
+#define KEY_RIGHT_CTRL     (MODIFIER_FLAG | 0x10)
+#define KEY_RIGHT_SHIFT    (MODIFIER_FLAG | 0x20)
+#define KEY_RIGHT_ALT      (MODIFIER_FLAG | 0x40)
+#define KEY_RIGHT_GUI      (MODIFIER_FLAG | 0x80)
 
 // Letter keys
 #define KEY_A              0x04
@@ -76,16 +62,32 @@
 #define KEY_SPACE          0x2C
 #define KEY_MINUS          0x2D
 #define KEY_EQUAL          0x2E
-#define KEY_LEFT_BRACE     0x2F  // [
-#define KEY_RIGHT_BRACE    0x30  // ]
-#define KEY_BACKSLASH      0x31  // backslash
-#define KEY_SEMICOLON      0x33  // ;
-#define KEY_APOSTROPHE     0x34  // '
-#define KEY_GRAVE          0x35  // `
-#define KEY_COMMA          0x36  // ,
-#define KEY_DOT            0x37  // .
-#define KEY_SLASH          0x38  // /
-
+#define KEY_LEFT_BRACE     0x2F
+#define KEY_RIGHT_BRACE    0x30
+#define KEY_BACKSLASH      0x31
+#define KEY_SEMICOLON      0x33
+#define KEY_APOSTROPHE     0x34
+#define KEY_GRAVE          0x35
+#define KEY_COMMA          0x36
+#define KEY_DOT            0x37
+#define KEY_SLASH          0x38
+#define KEY_PRNT_SCRN      0xCE
+#define KEY_PAUSE          0xd0
+#define KEY_UP_ARROW       0x52
+#define KEY_DOWN_ARROW     0x51
+#define KEY_LEFT_ARROW     0x50
+#define KEY_RIGHT_ARROW    0x4F
+#define KEY_BACKSPACE      0x2A
+#define KEY_TAB            0x2B
+#define KEY_RETURN         0x28
+#define KEY_ESC            0x29
+#define KEY_INSERT         0x49
+#define KEY_DELETE         0x4C
+#define KEY_PAGE_UP        0x4B
+#define KEY_PAGE_DOWN      0x4E
+#define KEY_HOME           0x4A
+#define KEY_END            0x4D
+#define KEY_CAPS_LOCK      0x39
 #define KEY_F1             0x3A
 #define KEY_F2             0x3B
 #define KEY_F3             0x3C
@@ -105,12 +107,9 @@
 #define KEY_KEYPAD_MINUS   0x56  // -
 #define KEY_KEYPAD_PLUS    0x57  // +
 
-int8_t hid_keyboard_press(uint8_t key);
-int8_t hid_keyboard_release(uint8_t key);
+int8_t hid_keyboard_button(uint8_t key, uint8_t mode);
 int8_t hid_keyboard_release_all(void);
-int8_t hid_keyboard_release_both_shifts(void);
-int8_t hid_keyboard_set_modifier(uint8_t modifier_bit);
-int8_t hid_keyboard_clear_modifier(uint8_t modifier_bit);
+int8_t hid_keyboard_modifier(uint8_t modifier_bit, uint8_t mode);
 void hid_wait_for_usb_idle(void);
 
 #endif

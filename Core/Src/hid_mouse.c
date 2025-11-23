@@ -20,7 +20,7 @@ int8_t hid_mouse_move_with_pan(int8_t x, int8_t y, int8_t wheel, int8_t pan)
     return USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, mouse_report, 6);
 }
 
-int8_t hid_mouse_press(uint8_t button)
+static int8_t hid_mouse_press(uint8_t button)
 {
     mouse_buttons |= button;
     // Report ID (1 byte) + buttons (1 byte) + X (1 byte) + Y (1 byte) + wheel (1 byte) + pan (1 byte) = 6 bytes
@@ -28,12 +28,22 @@ int8_t hid_mouse_press(uint8_t button)
     return USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, mouse_report, 6);
 }
 
-int8_t hid_mouse_release(uint8_t button)
+static int8_t hid_mouse_release(uint8_t button)
 {
     mouse_buttons &= ~button;
     // Report ID (1 byte) + buttons (1 byte) + X (1 byte) + Y (1 byte) + wheel (1 byte) + pan (1 byte) = 6 bytes
     uint8_t mouse_report[6] = {0x02, mouse_buttons, 0, 0, 0, 0};
     return USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, mouse_report, 6);
+}
+
+
+int8_t hid_mouse_button(uint8_t button, uint8_t mode)
+{
+    if (mode == KEY_PRESSED) {
+        return hid_mouse_press(button);
+    } else {
+        return hid_mouse_release(button);
+    }
 }
 
 int8_t hid_mouse_release_all(void)

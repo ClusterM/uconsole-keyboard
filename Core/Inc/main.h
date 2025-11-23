@@ -143,7 +143,8 @@ void Error_Handler(void);
 #define KEY10_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-
+#define KEY_PRESSED 1
+#define KEY_RELEASED 0
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

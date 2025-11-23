@@ -11,8 +11,7 @@
 #define CONSUMER_BRIGHTNESS_UP       0x6F
 #define CONSUMER_BRIGHTNESS_DOWN     0x70
 
-int8_t hid_consumer_press(uint16_t code);
-int8_t hid_consumer_release(uint16_t code); // 0 = release all, otherwise release specific code
+int8_t hid_consumer_button(uint16_t code, uint8_t mode);
 
 #endif
 

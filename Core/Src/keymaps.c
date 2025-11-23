@@ -46,13 +46,13 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_KEYPAD_ASTERISK,    // Gamepad B
         KEY_KEYPAD_SLASH,       // Gamepad A
         KEY_LEFT_SHIFT,         // Left shift
-        KEY_RIGHT_SHIFT,       // Right shift
-        KEY_LEFT_CTRL,         // Left ctrl
-        KEY_RIGHT_CTRL,        // Right ctrl
-        KEY_LEFT_ALT,          // Left alt
-        SK_MOUSE_LEFT,         // Gamepad L
-        KEY_RIGHT_ALT,        // Right alt
-        SK_MOUSE_RIGHT        // Gamepad R
+        KEY_RIGHT_SHIFT,        // Right shift
+        KEY_LEFT_CTRL,          // Left ctrl
+        KEY_RIGHT_CTRL,         // Right ctrl
+        KEY_LEFT_ALT,           // Left alt
+        SK_MOUSE_LEFT,          // Gamepad L
+        KEY_RIGHT_ALT,          // Right alt
+        SK_MOUSE_RIGHT          // Gamepad R
     },
     
     [FN_LAYER] = {
@@ -66,13 +66,13 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_KEYPAD_ASTERISK,    // Gamepad B
         KEY_KEYPAD_SLASH,       // Gamepad A
         KEY_LEFT_SHIFT,         // Left shift
-        KEY_RIGHT_SHIFT,       // Right shift
-        KEY_LEFT_CTRL,         // Left ctrl
-        KEY_RIGHT_CTRL,        // Right ctrl
-        KEY_LEFT_GUI,          // Left alt
-        SK_MOUSE_LEFT,         // Gamepad L
-        KEY_RIGHT_ALT,         // Right alt
-        SK_MOUSE_RIGHT         // Gamepad R
+        KEY_RIGHT_SHIFT,        // Right shift
+        KEY_LEFT_CTRL,          // Left ctrl
+        KEY_RIGHT_CTRL,         // Right ctrl
+        KEY_LEFT_GUI,           // Left alt
+        SK_MOUSE_LEFT,          // Gamepad L
+        KEY_RIGHT_ALT,          // Right alt
+        SK_MOUSE_RIGHT          // Gamepad R
     }
 };
 
@@ -83,8 +83,11 @@ static void jump_to_bootloader(void);
 static void do_the_key(uint16_t k, uint8_t mode)
 {
     switch (k) {
+        case EMP:
+            break;
+
         case SK_FN_KEY:
-            keyboard_state.layer = mode == KEY_PRESSED ? FN_LAYER : 0;
+            keyboard_state.layer = mode == KEY_PRESSED ? FN_LAYER : DEF_LAYER;
             break;
 
         case KEY_LEFT_CTRL:
@@ -95,98 +98,56 @@ static void do_the_key(uint16_t k, uint8_t mode)
         case KEY_RIGHT_SHIFT:
         case KEY_LEFT_GUI:
         case KEY_RIGHT_GUI:
-            k &= ~0x1000; // Clear internal code flag
+            k &= ~MODIFIER_FLAG; // Clear internal code flag
             if (mode == KEY_PRESSED) {
                 keyboard_state.mod_keys_on |= k;
-                hid_keyboard_set_modifier((uint8_t)k);
             } else {
                 keyboard_state.mod_keys_on &= ~k;
-                hid_keyboard_clear_modifier((uint8_t)k);
             }
+            hid_keyboard_modifier(k, mode);
             break;
 
         case SK_MOUSE_LEFT:
-            if (mode == KEY_PRESSED) {
-                hid_mouse_press(MOUSE_LEFT);
-            } else {
-                hid_mouse_release(MOUSE_LEFT);
-            }
-            break;
-            
         case SK_MOUSE_MID:
-            if (mode == KEY_PRESSED) {
-                hid_mouse_press(MOUSE_MIDDLE);
-            } else {
-                hid_mouse_release(MOUSE_MIDDLE);
-            }
-            break;
-            
         case SK_MOUSE_RIGHT:
-            if (mode == KEY_PRESSED) {
-                hid_mouse_press(MOUSE_RIGHT);
-            } else {
-                hid_mouse_release(MOUSE_RIGHT);
-            }
+            hid_mouse_button(k, mode);
             break;            
                         
         case SK_SELECT_KEY:
-            // SELECT key - not used in new implementation
-            break;
-        
         case SK_START_KEY:
-            // START key - not used in new implementation
+            // TODO?
             break;
 
         case SK_BRIGHTNESS_UP:
-            if (mode == KEY_PRESSED) {
-                hid_consumer_press(CONSUMER_BRIGHTNESS_UP);
-            } else {
-                hid_consumer_release(CONSUMER_BRIGHTNESS_UP);
-            }
+            hid_consumer_button(CONSUMER_BRIGHTNESS_UP, mode);
             break;
             
         case SK_BRIGHTNESS_DOWN:
-            if (mode == KEY_PRESSED) {
-                hid_consumer_press(CONSUMER_BRIGHTNESS_DOWN);
-            } else {
-                hid_consumer_release(CONSUMER_BRIGHTNESS_DOWN);
-            }
+            hid_consumer_button(CONSUMER_BRIGHTNESS_DOWN, mode);
             break;
 
         case SK_VOLUME_P:
-            if (mode == KEY_PRESSED) {
-                hid_consumer_press(CONSUMER_VOLUME_UP);
-            } else {
-                hid_consumer_release(CONSUMER_VOLUME_UP);
-            }
+            hid_consumer_button(CONSUMER_VOLUME_UP, mode);
             break;
 
         case SK_VOLUME_M:
             if (mode == KEY_PRESSED) {
                 if (keyboard_state.mod_keys_on & (KEY_LEFT_SHIFT | KEY_RIGHT_SHIFT)) {
-                    // Shift was pressed - increase volume
-                    // Release both shifts in HID report (so they don't affect other keys)
-                    // But keep sf_on set (so subsequent presses will also increase volume)
-                    // Release both shifts in one operation to avoid overwriting reports
-                    // hid_keyboard_release_both_shifts() already waits for USB idle
-                    hid_keyboard_release_both_shifts();
-                    hid_consumer_press(CONSUMER_VOLUME_UP);
+                    // Shift was pressed - increase volume, but release the shift first
+                    hid_keyboard_modifier((uint8_t)(KEY_LEFT_SHIFT | KEY_RIGHT_SHIFT), KEY_RELEASED);
+                    hid_consumer_button(CONSUMER_VOLUME_UP, KEY_PRESSED);
                 } else {
                     // No shift - decrease volume
-                    hid_consumer_press(CONSUMER_VOLUME_DOWN);
+                    hid_consumer_button(CONSUMER_VOLUME_DOWN, KEY_PRESSED);
                 }
             } else {
-                hid_consumer_release(CONSUMER_VOLUME_UP);
-                hid_consumer_release(CONSUMER_VOLUME_DOWN);
+                hid_consumer_button(CONSUMER_VOLUME_UP, KEY_RELEASED);
+                hid_consumer_button(CONSUMER_VOLUME_DOWN, KEY_RELEASED);
             }
             break;
 
         case SK_VOLUME_MUTE:
-            if (mode == KEY_PRESSED) {
-                hid_consumer_press(CONSUMER_MUTE);
-            } else {
-                hid_consumer_release(CONSUMER_MUTE);
-            }
+            hid_consumer_button(CONSUMER_MUTE, mode);
             break;
 
         case SK_KEYBOARD_LOCK:
@@ -208,24 +169,16 @@ static void do_the_key(uint16_t k, uint8_t mode)
         case KEY_KEYPAD_ASTERISK:
             // Special case for keypad * key - update mode
             // Check if Fn is pressed (Fn + * = bootloader)
-            if (mode == KEY_PRESSED && keyboard_state.layer > 0) {
+            if (mode == KEY_PRESSED && keyboard_state.layer == FN_LAYER) {
                 // Jump to bootloader
                 jump_to_bootloader();
-            } else if (mode == KEY_PRESSED) {
-                // Normal keypad * key
-                hid_keyboard_press(KEY_KEYPAD_ASTERISK);
-            } else if (mode == KEY_RELEASED) {
-                hid_keyboard_release(KEY_KEYPAD_ASTERISK);
             }
+            hid_keyboard_button(KEY_KEYPAD_ASTERISK, mode);
             break;
 
         default:
             if (k < 0x100) {
-                if (mode == KEY_PRESSED) {
-                    hid_keyboard_press((uint8_t)k);
-                } else {
-                    hid_keyboard_release((uint8_t)k);
-                }
+                hid_keyboard_button((uint8_t)k, mode);
             }
             break;
     }

@@ -21,7 +21,7 @@ static uint8_t usage_to_bit(uint16_t code)
     }
 }
 
-int8_t hid_consumer_press(uint16_t code)
+static int8_t hid_consumer_press(uint16_t code)
 {
     uint8_t bit = usage_to_bit(code);
     if (bit == 255) return USBD_FAIL; // Invalid code
@@ -49,7 +49,7 @@ int8_t hid_consumer_press(uint16_t code)
     return result;
 }
 
-int8_t hid_consumer_release(uint16_t code)
+static int8_t hid_consumer_release(uint16_t code)
 {
     if (code == 0) {
         // Release all buttons
@@ -84,3 +84,11 @@ int8_t hid_consumer_release(uint16_t code)
     return result;
 }
 
+int8_t hid_consumer_button(uint16_t code, uint8_t mode)
+{
+    if (mode == KEY_PRESSED) {
+        return hid_consumer_press(code);
+    } else {
+        return hid_consumer_release(code);
+    }
+}
