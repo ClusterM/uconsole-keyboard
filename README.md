@@ -37,6 +37,11 @@ This port completely eliminates all that Arduino nonsense and uses clean STM32 H
 - **Fn + X** (the X button in the gamepad section) now triggers a **bootloader jump** for easy firmware updates. The `make flash` command will wait for you to manually enter DFU mode using this combination.
 
 
+## How to change key bindings
+
+You can configure all key bindings, key combinations, and behaviors in the `Core/Src/keymaps.c` file.
+
+
 ## Building
 
 Simply use `make`:
