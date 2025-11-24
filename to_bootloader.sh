@@ -48,6 +48,12 @@ wait_for_bootloader() {
     exit 0
 }
 
+# If not Linux or lsusb is not installed, exit
+if [ "$(uname -s)" != "Linux" ] || ! command -v lsusb &> /dev/null; then
+    echo "Can't put the keyboard into DFU mode automatically on this platform, please put it into DFU mode manually"
+    exit 0
+fi
+
 # Check if the keyboard is preset
 if lsusb | grep -q "$DEVICE_VID_PID"; then
     bootloader_via_leds

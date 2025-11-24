@@ -221,7 +221,11 @@ clean:
 #######################################
 flash: $(BUILD_DIR)/$(TARGET).bin
 	./to_bootloader.sh
-	sudo dfu-util -d 1EAF:0003 -a 2 -D $(BUILD_DIR)/$(TARGET).bin || true
+	@if [ "$$(uname -s)" = "Linux" ]; then \
+		sudo dfu-util -d 1EAF:0003 -a 2 -D $(BUILD_DIR)/$(TARGET).bin || true; \
+	else \
+		dfu-util -d 1EAF:0003 -a 2 -D $(BUILD_DIR)/$(TARGET).bin || true; \
+	fi
   
 #######################################
 # dependencies
