@@ -49,6 +49,7 @@ Core/Src/hid_consumer.c \
 Core/Src/ratemeter.c \
 Core/Src/glider.c \
 Core/Src/math_utils.c \
+Core/Src/leds.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c \
@@ -219,18 +220,7 @@ clean:
 # flash the device
 #######################################
 flash: $(BUILD_DIR)/$(TARGET).bin
-	@echo "Press Fn+X(on gamepad) to enter DFU mode"
-	@TIMEOUT=30; \
-	while ! lsusb | grep -q "1eaf:0003"; do \
-		echo -n "."; \
-		sleep 1; \
-		TIMEOUT=$$((TIMEOUT - 1)); \
-		if [ $$TIMEOUT -eq 0 ]; then \
-			echo "Timeout waiting for DFU mode"; \
-			exit 1; \
-		fi; \
-	done
-	echo
+	./to_bootloader.sh
 	sudo dfu-util -d 1EAF:0003 -a 2 -D $(BUILD_DIR)/$(TARGET).bin || true
   
 #######################################
