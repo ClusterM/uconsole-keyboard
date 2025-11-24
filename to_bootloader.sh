@@ -21,15 +21,28 @@ bootloader_via_leds() {
     led_kana=$(find_led_file "kana")
     if [ -z "$led_compose" ] || [ -z "$led_kana" ]; then
         echo "LED files not found"
-        return 1
+        return 1 
     fi
 
-    echo 0 > "$led_compose/brightness"
-    echo 0 > "$led_kana/brightness"
-    echo 1 > "$led_compose/brightness"
-    echo 1 > "$led_kana/brightness"
-
-    return 0
+    TIMEOUT=30; \
+    while ! lsusb | grep -q "$DFU_VID_PID"; do
+        echo -n "."
+        if [ -f "$led_compose/brightness" ] && [ -f "$led_kana/brightness" ]; then
+            echo 0 > "$led_compose/brightness"
+            echo 0 > "$led_kana/brightness"
+            echo 1 > "$led_compose/brightness"
+            echo 1 > "$led_kana/brightness"
+        fi
+        sleep 1
+        TIMEOUT=$((TIMEOUT - 1))
+        if [ $TIMEOUT -eq 0 ]; then
+            echo
+            echo "Timeout waiting for DFU mode"
+            exit 1
+        fi
+    done
+    echo
+    exit 0
 }
 
 wait_for_bootloader() {
@@ -57,7 +70,6 @@ fi
 # Check if the keyboard is preset
 if lsusb | grep -q "$DEVICE_VID_PID"; then
     bootloader_via_leds
-    wait_for_bootloader
 else
     echo "Connect the keyboard to the computer and put it into DFU mode"
     wait_for_bootloader
