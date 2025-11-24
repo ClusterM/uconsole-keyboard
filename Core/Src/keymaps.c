@@ -18,7 +18,7 @@ const uint16_t matrix_maps[][MATRIX_KEYS] = {
         KEY_O, KEY_P, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_H,
         KEY_J, KEY_K, KEY_L, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,
         KEY_N, KEY_M, KEY_COMMA, KEY_DOT, KEY_SLASH, KEY_BACKSLASH, KEY_SEMICOLON, KEY_APOSTROPHE,
-        KEY_BACKSPACE, KEY_RETURN, SK_FN_KEY, KEY_LEFT_GUI, KEY_SPACE, EMP, EMP, EMP
+        KEY_BACKSPACE, KEY_RETURN, SK_FN_KEY, SK_FN_KEY, KEY_SPACE, EMP, EMP, EMP
     },
     
     [FN_LAYER] = {
@@ -41,8 +41,8 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_DOWN_ARROW,         // Down
         KEY_LEFT_ARROW,         // Left
         KEY_RIGHT_ARROW,        // Right
-        MOUSE_FORWARD,          // Gamepad A
-        MOUSE_BACK,             // Gamepad B
+        KEY_LEFT_GUI,           // Gamepad A
+        KEY_KEYPAD_ASTERISK,    // Gamepad B
         MOUSE_RIGHT,            // Gamepad X
         MOUSE_LEFT,             // Gamepad Y
         KEY_LEFT_SHIFT,         // Left shift
@@ -62,8 +62,8 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_END,                // Right
         KEY_KEYPAD_PLUS,        // Gamepad A
         KEY_KEYPAD_MINUS,       // Gamepad B
-        KEY_KEYPAD_ASTERISK,    // Gamepad X
-        KEY_KEYPAD_SLASH,       // Gamepad Y
+        MOUSE_FORWARD,          // Gamepad X
+        MOUSE_BACK,             // Gamepad Y
         KEY_LEFT_SHIFT,         // Left shift
         KEY_RIGHT_SHIFT,        // Right shift
         KEY_LEFT_CTRL,          // Left ctrl
