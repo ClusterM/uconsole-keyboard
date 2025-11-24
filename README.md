@@ -34,7 +34,6 @@ This port completely eliminates all that Arduino nonsense and uses clean STM32 H
 - **Keyboard backlight dimming after inactivity** - The keyboard backlight brightness automatically decreases after a period of inactivity (configurable via `Core/Inc/config.h`)
 - **Y/X/B/A buttons** now serve desktop-friendly actions: Y = **mouse left click** (Fn+Y = **keypad /**), X = **Left GUI/Cmd** (Fn+X = **keypad \*** + bootloader shortcut), B = **mouse Back** (Fn+B = **keypad -**), A = **mouse Forward** (Fn+A = **keypad +**).
 - **Fn + Alt** combination now triggers the **left Cmd/GUI key** instead of the right one, because Raspberry Pi OS only responds to the left Cmd key by default.
-- **Fn + X** (the X button in the gamepad section) now triggers a **bootloader jump** for easy firmware updates. The `make flash` command will wait for you to manually enter DFU mode using this combination.
 
 
 ## How to change key bindings
