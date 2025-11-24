@@ -17,12 +17,10 @@ static uint8_t usage_to_bit(uint16_t code)
         case CONSUMER_MUTE:           return 2;   // Bit 2
         case CONSUMER_BRIGHTNESS_UP:  return 3;   // Bit 3
         case CONSUMER_BRIGHTNESS_DOWN: return 4;  // Bit 4
-        case CONSUMER_AC_BACK:        return 5;   // Bit 5
-        case CONSUMER_AC_FORWARD:     return 6;   // Bit 6
-        case CONSUMER_SCAN_NEXT_TRACK: return 7;  // Bit 7
-        case CONSUMER_SCAN_PREV_TRACK: return 8;  // Bit 8
-        case CONSUMER_STOP:           return 9;   // Bit 9
-        case CONSUMER_PLAY_PAUSE:     return 10;  // Bit 10
+        case CONSUMER_SCAN_NEXT_TRACK: return 5;  // Bit 5
+        case CONSUMER_SCAN_PREV_TRACK: return 6;  // Bit 6
+        case CONSUMER_STOP:           return 7;   // Bit 7
+        case CONSUMER_PLAY_PAUSE:     return 8;   // Bit 8
         default:                      return 255; // Invalid
     }
 }

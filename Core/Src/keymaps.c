@@ -41,10 +41,10 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_DOWN_ARROW,         // Down
         KEY_LEFT_ARROW,         // Left
         KEY_RIGHT_ARROW,        // Right
-        KEY_KEYPAD_PLUS,        // Gamepad Y
-        KEY_KEYPAD_MINUS,       // Gamepad X
-        KEY_KEYPAD_ASTERISK,    // Gamepad B
-        KEY_KEYPAD_SLASH,       // Gamepad A
+        MOUSE_FORWARD,          // Gamepad A
+        MOUSE_BACK,             // Gamepad B
+        KEY_LEFT_GUI,           // Gamepad X
+        MOUSE_LEFT,             // Gamepad Y
         KEY_LEFT_SHIFT,         // Left shift
         KEY_RIGHT_SHIFT,        // Right shift
         KEY_LEFT_CTRL,          // Left ctrl
@@ -54,17 +54,16 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_RIGHT_ALT,          // Right alt
         MOUSE_RIGHT,            // Gamepad R
     },
-    
     [FN_LAYER] = {
         MOUSE_MIDDLE,           // Trackball button
         KEY_PAGE_UP,            // Up
         KEY_PAGE_DOWN,          // Down
         KEY_HOME,               // Left
         KEY_END,                // Right
-        KEY_KEYPAD_PLUS,        // Gamepad Y
-        KEY_KEYPAD_MINUS,       // Gamepad X
-        KEY_KEYPAD_ASTERISK,    // Gamepad B
-        KEY_KEYPAD_SLASH,       // Gamepad A
+        KEY_KEYPAD_PLUS,        // Gamepad A
+        KEY_KEYPAD_MINUS,       // Gamepad B
+        KEY_KEYPAD_ASTERISK,    // Gamepad X
+        KEY_KEYPAD_SLASH,       // Gamepad Y
         KEY_LEFT_SHIFT,         // Left shift
         KEY_RIGHT_SHIFT,        // Right shift
         KEY_LEFT_CTRL,          // Left ctrl
@@ -120,15 +119,15 @@ static void do_the_key(uint16_t k, uint8_t mode)
             }
             break;
 
-        case KEY_KEYPAD_ASTERISK:
-            // Special case for keypad * key - update mode
-            // Check if Fn is pressed (Fn + * = bootloader)
-            if (mode == KEY_PRESSED && keyboard_state.layer == FN_LAYER) {
-                // Jump to bootloader
-                jump_to_bootloader();
-            }
-            hid_keyboard_button(KEY_KEYPAD_ASTERISK, mode);
-            break;
+        // case KEY_KEYPAD_ASTERISK:
+        //     // Special case for keypad * key - update mode
+        //     // Check if Fn is pressed (Fn + * = bootloader)
+        //     if (mode == KEY_PRESSED && keyboard_state.layer == FN_LAYER) {
+        //         // Jump to bootloader
+        //         jump_to_bootloader();
+        //     }
+        //     hid_keyboard_button(KEY_KEYPAD_ASTERISK, mode);
+        //     break;
 
         case EMP:
             /* Do nothing */

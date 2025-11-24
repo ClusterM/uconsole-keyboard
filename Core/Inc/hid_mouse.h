@@ -7,6 +7,8 @@
 #define MOUSE_LEFT      (MOUSE_BUTTON_FLAG | 0x01)
 #define MOUSE_RIGHT     (MOUSE_BUTTON_FLAG | 0x02)
 #define MOUSE_MIDDLE    (MOUSE_BUTTON_FLAG | 0x04)
+#define MOUSE_BACK      (MOUSE_BUTTON_FLAG | 0x08)
+#define MOUSE_FORWARD   (MOUSE_BUTTON_FLAG | 0x10)
 
 int8_t hid_mouse_move(int8_t x, int8_t y, int8_t wheel);
 int8_t hid_mouse_move_with_pan(int8_t x, int8_t y, int8_t wheel, int8_t pan);
