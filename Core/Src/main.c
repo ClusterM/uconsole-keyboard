@@ -176,6 +176,16 @@ int main(void)
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
   
+  // Blink on startup
+  for (int i = 0; i < 2000; i += 100) {
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i);
+    HAL_Delay(25);
+  }
+  for (int i = 2000; i >= 0; i -= 100) {
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i);
+    HAL_Delay(25);
+  }  
+  
   // Wait for USB connection
   HAL_Delay(1000);
   
