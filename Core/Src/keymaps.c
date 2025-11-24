@@ -113,7 +113,7 @@ static void do_the_key(uint16_t k, uint8_t mode)
         case SK_KEYBOARD_LIGHT:
             if (mode == KEY_PRESSED) {
                 keyboard_state.backlight++;
-                if (keyboard_state.backlight >= 3) {
+                if (keyboard_state.backlight >= (sizeof(backlight_vals) / sizeof(backlight_vals[0]))) {
                     keyboard_state.backlight = 0;
                 }
                 // PWM will be set in main loop

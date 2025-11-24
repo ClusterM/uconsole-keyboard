@@ -21,6 +21,7 @@ typedef struct {
     uint16_t mod_keys_on;
     uint8_t backlight;
     uint8_t lock;
+    uint32_t last_activity_time;
 } KEYBOARD_STATE;
 
 extern KEYBOARD_STATE keyboard_state;

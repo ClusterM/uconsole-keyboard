@@ -17,11 +17,11 @@ This port completely eliminates all that Arduino nonsense and uses clean STM32 H
 ## What's Included
 
 ✅ **Fully ported features:**
-- Full keyboard matrix scanning (8x8 matrix)
+- Full keyboard matrix scanning (8×8 matrix)
 - All key mappings and layouts
-- Separate button handling (17 buttons)
+- Individual button handling (17 buttons)
 - Fn key functionality and all Fn combinations
-- Trackball operation with complete acceleration mathematics (glider, ratemeter)
+- Trackball operation with complete acceleration calculations (glider, ratemeter)
 - Backlight brightness control via PWM
 - USB HID keyboard and mouse support
 - USB Consumer controls (volume, brightness)
@@ -29,16 +29,17 @@ This port completely eliminates all that Arduino nonsense and uses clean STM32 H
 ❌ **Removed features:**
 - Gamepad/joystick functionality (does anyone actually use this?)
 
-🔧 **Customizations:**
-- **Horizontal scrolling!** Now you can use Fn + Trackball to scroll horizontally as well as vertically.
+🔧 **What's changed/added:**
+- **Horizontal scrolling!** You can now use Fn + Trackball to scroll horizontally as well as vertically.
+- **Keyboard backlight dimming after inactivity** - The keyboard backlight brightness automatically decreases after a period of inactivity (configurable via `Core/Inc/config.h`)
 - **Y, X, B, A buttons** (previously gamepad buttons) are now mapped to **keypad keys**: `/`, `*`, `-`, `+`. These are very useful in file managers and terminal applications.
 - **Fn + Alt** combination now triggers the **left Cmd/GUI key** instead of the right one, because Raspberry Pi OS only responds to the left Cmd key by default.
-- **Fn + X** (the X button in the gamepad section) now triggers a **bootloader jump** for easy firmware updates. However, the `make flash` command will attempt to do this automatically.
+- **Fn + X** (the X button in the gamepad section) now triggers a **bootloader jump** for easy firmware updates. The `make flash` command will wait for you to manually enter DFU mode using this combination.
 
 
 ## Building
 
-You can just use `make`:
+Simply use `make`:
 
 ```bash
 # Build the firmware
@@ -57,7 +58,7 @@ For the **first firmware flash**, you need to use one of these methods:
 
 1. **Official flashing script**: Use the official ClockworkPi flashing script from [uconsole_keyboard_flash.tar.gz](https://github.com/clockworkpi/uConsole/raw/master/Bin/uconsole_keyboard_flash.tar.gz) (replace `uconsole_keyboard.ino.bin` with the new firmware)
 
-2. **Hardware switch**: Use the switch on the back of the keyboard to put it into update/flashing mode
+2. **Hardware switch**: Use the switch on the back of the keyboard to switch it to update/flashing mode
 
 After the first flash, you can use `make flash`. The command will wait for you to manually enter DFU mode by pressing Fn+X combination on the keyboard.
 

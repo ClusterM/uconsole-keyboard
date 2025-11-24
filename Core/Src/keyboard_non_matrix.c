@@ -78,6 +78,7 @@ void non_matrix_task(void)
                     non_matrix_action(c, KEY_RELEASED);
                 }
                 keys_prev ^= mask;
+                keyboard_state.last_activity_time = HAL_GetTick();
             }
         }
     }

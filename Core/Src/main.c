@@ -22,7 +22,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "keyboard_matrix.h"
 #include "keyboard_non_matrix.h"
 #include "trackball.h"
 #include "keymaps.h"
@@ -168,20 +167,6 @@ int main(void)
   keyboard_state.backlight = 0;
   keyboard_state.lock = 0;
   
-  // Sticky keys initialization - currently not used/implemented
-  // keyboard_state.ctrl.lock = 0;
-  // keyboard_state.ctrl.time = 0;
-  // keyboard_state.ctrl.begin = 0;
-  // keyboard_state.shift.lock = 0;
-  // keyboard_state.shift.time = 0;
-  // keyboard_state.shift.begin = 0;
-  // keyboard_state.alt.lock = 0;
-  // keyboard_state.alt.time = 0;
-  // keyboard_state.alt.begin = 0;
-  // keyboard_state.fn.lock = 0;
-  // keyboard_state.fn.time = 0;
-  // keyboard_state.fn.begin = 0;
-  
   // Initialize modules
   matrix_init();
   non_matrix_init();
@@ -201,9 +186,23 @@ int main(void)
   while (1)
   {
     // Update backlight PWM
-    const uint16_t backlight_vals[3] = {0, 500, 2000};
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, backlight_vals[keyboard_state.backlight]);
-    
+    uint32_t time = HAL_GetTick();
+    if (time - keyboard_state.last_activity_time < KEYBOARD_BACKLIGHT_OFF_TIME * 1000) {
+      // Normal backlight
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, backlight_vals[keyboard_state.backlight]);
+    } else if (time - keyboard_state.last_activity_time >= KEYBOARD_BACKLIGHT_OFF_TIME * 1000 + KEYBOARD_BACKLIGHT_DIM_OUT_DURATION) {
+      // Turn off the backlight
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, KEYBOARD_BACKLIGHT_DIMMED_OUT_VALUE);
+    } else {
+      // Dim out the backlight
+      uint32_t full_off_remaining_time = keyboard_state.last_activity_time + KEYBOARD_BACKLIGHT_OFF_TIME * 1000 + KEYBOARD_BACKLIGHT_DIM_OUT_DURATION - time;
+      uint32_t dim_out_value = ((uint32_t)backlight_vals[keyboard_state.backlight] - KEYBOARD_BACKLIGHT_DIMMED_OUT_VALUE) 
+        * full_off_remaining_time 
+        / KEYBOARD_BACKLIGHT_DIM_OUT_DURATION
+        + KEYBOARD_BACKLIGHT_DIMMED_OUT_VALUE;
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, dim_out_value);
+    }
+
     // Main tasks
     matrix_task();
     non_matrix_task();

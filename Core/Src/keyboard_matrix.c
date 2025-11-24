@@ -161,6 +161,7 @@ void matrix_task(void)
                         matrix_release(r, c);
                     }
                     matrix_prev[r] ^= col_mask;
+                    keyboard_state.last_activity_time = HAL_GetTick();
                 }
             }
         }
