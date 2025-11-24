@@ -11,6 +11,8 @@
 #define CONSUMER_MUTE               (CONSUMER_KEY_FLAG | 0xE2)
 #define CONSUMER_BRIGHTNESS_UP      (CONSUMER_KEY_FLAG | 0x6F)
 #define CONSUMER_BRIGHTNESS_DOWN    (CONSUMER_KEY_FLAG | 0x70)
+#define CONSUMER_AC_BACK            (CONSUMER_KEY_FLAG | 0x24)
+#define CONSUMER_AC_FORWARD         (CONSUMER_KEY_FLAG | 0x25)
 
 int8_t hid_consumer_button(uint16_t code, uint8_t mode);
 

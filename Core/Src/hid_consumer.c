@@ -17,6 +17,8 @@ static uint8_t usage_to_bit(uint16_t code)
         case CONSUMER_MUTE:           return 2;   // Bit 2
         case CONSUMER_BRIGHTNESS_UP:  return 3;   // Bit 3
         case CONSUMER_BRIGHTNESS_DOWN: return 4;  // Bit 4
+        case CONSUMER_AC_BACK:        return 5;   // Bit 5
+        case CONSUMER_AC_FORWARD:     return 6;   // Bit 6
         default:                      return 255; // Invalid
     }
 }
