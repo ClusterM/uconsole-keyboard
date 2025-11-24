@@ -78,7 +78,6 @@ const uint16_t keys_maps[][KEYS_NUM] = {
 static uint16_t matrix_pick_map[MATRIX_KEYS] = {0};
 static uint16_t non_matrix_pick_map[KEYS_NUM] = {0};
 
-
 static void do_the_key(uint16_t k, uint8_t mode)
 {
     switch (k) {
@@ -212,17 +211,4 @@ void non_matrix_action(uint8_t col, uint8_t mode)
             non_matrix_pick_map[col] = 0;
         }
     }
-}
-
-/**
-  * @brief  Reset to bootloader via watchdog
-  * @retval None (never returns)
-  */
-static void jump_to_bootloader(void)
-{
-    IWDG->KR = 0x5555;
-    IWDG->PR = 0;
-    IWDG->RLR = 1;
-    IWDG->KR = 0xCCCC;
-    while (1);  
 }
