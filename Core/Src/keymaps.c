@@ -18,7 +18,7 @@ const uint16_t matrix_maps[][MATRIX_KEYS] = {
         KEY_O, KEY_P, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_H,
         KEY_J, KEY_K, KEY_L, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,
         KEY_N, KEY_M, KEY_COMMA, KEY_DOT, KEY_SLASH, KEY_BACKSLASH, KEY_SEMICOLON, KEY_APOSTROPHE,
-        KEY_BACKSPACE, KEY_RETURN, SK_FN_KEY, SK_FN_KEY, KEY_SPACE, EMP, EMP, EMP
+        KEY_BACKSPACE, KEY_RETURN, SK_FN_KEY, KEY_LEFT_GUI, KEY_SPACE, EMP, EMP, EMP
     },
     
     [FN_LAYER] = {
@@ -43,7 +43,7 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_RIGHT_ARROW,        // Right
         MOUSE_FORWARD,          // Gamepad A
         MOUSE_BACK,             // Gamepad B
-        KEY_LEFT_GUI,           // Gamepad X
+        MOUSE_RIGHT,            // Gamepad X
         MOUSE_LEFT,             // Gamepad Y
         KEY_LEFT_SHIFT,         // Left shift
         KEY_RIGHT_SHIFT,        // Right shift
@@ -68,7 +68,7 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_RIGHT_SHIFT,        // Right shift
         KEY_LEFT_CTRL,          // Left ctrl
         KEY_RIGHT_CTRL,         // Right ctrl
-        KEY_LEFT_GUI,           // Left alt
+        KEY_LEFT_ALT,           // Left alt
         MOUSE_LEFT,             // Gamepad L
         KEY_RIGHT_ALT,          // Right alt
         MOUSE_RIGHT,            // Gamepad R
@@ -77,7 +77,7 @@ const uint16_t keys_maps[][KEYS_NUM] = {
 
 static uint16_t matrix_pick_map[MATRIX_KEYS] = {0};
 static uint16_t non_matrix_pick_map[KEYS_NUM] = {0};
-static void jump_to_bootloader(void);
+
 
 static void do_the_key(uint16_t k, uint8_t mode)
 {
