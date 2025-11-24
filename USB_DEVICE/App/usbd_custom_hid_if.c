@@ -181,6 +181,10 @@ __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_FS[USBD_CUSTOM_HID_REPORT_DES
   0x09, 0x70,        //   Usage (Brightness Decrement)
   0x09, 0x24,        //   Usage (AC Back)
   0x09, 0x25,        //   Usage (AC Forward)
+  0x09, 0xB5,        //   Usage (Scan Next Track)
+  0x09, 0xB6,        //   Usage (Scan Previous Track)
+  0x09, 0xB7,        //   Usage (Stop)
+  0x09, 0xCD,        //   Usage (Play/Pause)
   0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
   /* USER CODE END 0 */
   0xC0    /*     END_COLLECTION	             */

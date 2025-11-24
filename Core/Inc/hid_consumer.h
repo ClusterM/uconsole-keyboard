@@ -13,6 +13,10 @@
 #define CONSUMER_BRIGHTNESS_DOWN    (CONSUMER_KEY_FLAG | 0x70)
 #define CONSUMER_AC_BACK            (CONSUMER_KEY_FLAG | 0x24)
 #define CONSUMER_AC_FORWARD         (CONSUMER_KEY_FLAG | 0x25)
+#define CONSUMER_SCAN_NEXT_TRACK    (CONSUMER_KEY_FLAG | 0xB5)
+#define CONSUMER_SCAN_PREV_TRACK    (CONSUMER_KEY_FLAG | 0xB6)
+#define CONSUMER_STOP               (CONSUMER_KEY_FLAG | 0xB7)
+#define CONSUMER_PLAY_PAUSE         (CONSUMER_KEY_FLAG | 0xCD)
 
 int8_t hid_consumer_button(uint16_t code, uint8_t mode);
 
