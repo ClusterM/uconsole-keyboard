@@ -49,7 +49,7 @@ wait_for_bootloader() {
 }
 
 # If not Linux or lsusb is not installed, exit
-if [ "$(uname -s)" != "Linux" ] || ! command -v lsusb &> /dev/null; then
+if [ "$(uname -s)" != "Linux" ]; then
     echo "Can't put the keyboard into DFU mode automatically on this platform, please put it into DFU mode manually"
     exit 0
 fi

@@ -33,7 +33,7 @@ This port completely eliminates all that Arduino nonsense and uses clean STM32 H
 - **Horizontal scrolling!** Now you can use Fn + Trackball to scroll horizontally as well as vertically.
 - **Y, X, B, A buttons** (previously gamepad buttons) are now mapped to **keypad keys**: `/`, `*`, `-`, `+`. These are very useful in file managers and terminal applications.
 - **Fn + Alt** combination now triggers the **left Cmd/GUI key** instead of the right one, because Raspberry Pi OS only responds to the left Cmd key by default.
-- **Fn + X** (the X button on the gamepad area) now triggers a **bootloader jump** for easy firmware updates.
+- **Fn + X** (the X button in the gamepad section) now triggers a **bootloader jump** for easy firmware updates. However, the `make flash` command will attempt to do this automatically.
 
 
 ## Building
@@ -47,7 +47,7 @@ make all
 # Clean build files
 make clean
 
-# Flash the firmware (requires keyboard to be in DFU mode)
+# Flash the firmware
 make flash
 ```
 
