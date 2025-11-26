@@ -118,16 +118,6 @@ static void do_the_key(uint16_t k, uint8_t mode)
             }
             break;
 
-        // case KEY_KEYPAD_ASTERISK:
-        //     // Special case for keypad * key - update mode
-        //     // Check if Fn is pressed (Fn + * = bootloader)
-        //     if (mode == KEY_PRESSED && keyboard_state.layer == FN_LAYER) {
-        //         // Jump to bootloader
-        //         jump_to_bootloader();
-        //     }
-        //     hid_keyboard_button(KEY_KEYPAD_ASTERISK, mode);
-        //     break;
-
         case EMP:
             /* Do nothing */
             break;
