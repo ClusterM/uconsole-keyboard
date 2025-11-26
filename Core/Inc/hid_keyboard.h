@@ -72,8 +72,8 @@
 #define KEY_COMMA          0x36
 #define KEY_DOT            0x37
 #define KEY_SLASH          0x38
-#define KEY_PRNT_SCRN      0xCE
-#define KEY_PAUSE          0xd0
+#define KEY_PRNT_SCRN      0x46
+#define KEY_PAUSE          0x48
 #define KEY_UP_ARROW       0x52
 #define KEY_DOWN_ARROW     0x51
 #define KEY_LEFT_ARROW     0x50
