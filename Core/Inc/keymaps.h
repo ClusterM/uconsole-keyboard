@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include "keyboard_matrix.h"
 #include "keyboard_non_matrix.h"
-#define EMP 0xFFFF
 
 /* Special keys and virtual keys */
 enum SKEYS {
