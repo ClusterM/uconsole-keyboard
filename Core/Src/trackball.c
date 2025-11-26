@@ -193,12 +193,16 @@ void trackball_task(void)
         }
         if (w != 0 || hw != 0) {
             hid_mouse_move_with_pan(0, 0, -w, hw);  // Invert horizontal scroll direction
-            // keyboard_state.last_activity_time = HAL_GetTick();
+            #ifdef KEYBOARD_BACKLIGHT_RESUME_BY_TRACKBALL
+            keyboard_state.last_activity_time = HAL_GetTick();
+            #endif
         }
     } else {
         if (x != 0 || y != 0 || w != 0) {
             hid_mouse_move(x, y, -w);
-            // keyboard_state.last_activity_time = HAL_GetTick();
+            #ifdef KEYBOARD_BACKLIGHT_RESUME_BY_TRACKBALL
+            keyboard_state.last_activity_time = HAL_GetTick();
+            #endif
         }
     }
 }
