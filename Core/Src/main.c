@@ -164,7 +164,10 @@ int main(void)
   // Initialize keyboard state
   keyboard_state.layer = DEF_LAYER;
   keyboard_state.mod_keys_on = 0;
-  keyboard_state.backlight = 0;
+  keyboard_state.backlight = KEYBOARD_INITIAL_BACKLIGHT_VALUE_ID;
+  if (keyboard_state.backlight >= (sizeof(backlight_vals) / sizeof(backlight_vals[0]))) {
+    keyboard_state.backlight = 0;
+  }
   keyboard_state.lock = 0;
   
   // Initialize modules

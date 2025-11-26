@@ -15,4 +15,7 @@
 // The values for the keyboard backlight PWM (maximum value is 2000)
 static const uint16_t backlight_vals[3] = {0, 500, 2000};
 
+// The initial value of the keyboard backlight (index of the backlight_vals array)
+#define KEYBOARD_INITIAL_BACKLIGHT_VALUE_ID 0
+
 #endif
