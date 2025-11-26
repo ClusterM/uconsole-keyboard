@@ -11,25 +11,25 @@ KEYBOARD_STATE keyboard_state;
 // Mappings for the keyboard matrix
 const uint16_t matrix_maps[][MATRIX_KEYS] = {
     [DEF_LAYER] = {
-        EMP, EMP, CONSUMER_VOLUME_DOWN, KEY_GRAVE, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_MINUS, KEY_EQUAL,
+        KEY_NONE, KEY_NONE, CONSUMER_VOLUME_DOWN, KEY_GRAVE, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_MINUS, KEY_EQUAL,
         KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8,
-        KEY_9, KEY_0, KEY_ESC, KEY_TAB, EMP, EMP, EMP, EMP,
+        KEY_9, KEY_0, KEY_ESC, KEY_TAB, KEY_NONE, KEY_NONE, KEY_NONE, KEY_NONE,
         KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_U, KEY_I,
         KEY_O, KEY_P, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_H,
         KEY_J, KEY_K, KEY_L, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,
         KEY_N, KEY_M, KEY_COMMA, KEY_DOT, KEY_SLASH, KEY_BACKSLASH, KEY_SEMICOLON, KEY_APOSTROPHE,
-        KEY_BACKSPACE, KEY_RETURN, SK_FN_KEY, SK_FN_KEY, KEY_SPACE, EMP, EMP, EMP
+        KEY_BACKSPACE, KEY_RETURN, SK_FN_KEY, SK_FN_KEY, KEY_SPACE, KEY_NONE, KEY_NONE, KEY_NONE
     },
     
     [FN_LAYER] = {
         KEY_PRNT_SCRN, KEY_PAUSE, CONSUMER_MUTE, KEY_GRAVE, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_F11, KEY_F12,
         KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8,
-        KEY_F9, KEY_F10, SK_KEYBOARD_LOCK, KEY_CAPS_LOCK, EMP, EMP, EMP, EMP,
+        KEY_F9, KEY_F10, SK_KEYBOARD_LOCK, KEY_CAPS_LOCK, KEY_NONE, KEY_NONE, KEY_NONE, KEY_NONE,
         KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_PAGE_UP, KEY_INSERT,
         KEY_O, KEY_P, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_HOME,
         KEY_END, KEY_PAGE_DOWN, KEY_L, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,
         KEY_N, KEY_M, CONSUMER_BRIGHTNESS_DOWN, CONSUMER_BRIGHTNESS_UP, KEY_SLASH, KEY_BACKSLASH, KEY_SEMICOLON, KEY_APOSTROPHE,
-        KEY_DELETE, KEY_RETURN, SK_FN_KEY, SK_FN_KEY, SK_KEYBOARD_LIGHT, EMP, EMP, EMP
+        KEY_DELETE, KEY_RETURN, SK_FN_KEY, SK_FN_KEY, SK_KEYBOARD_LIGHT, KEY_NONE, KEY_NONE, KEY_NONE
     }
 };
 
@@ -118,12 +118,10 @@ static void do_the_key(uint16_t k, uint8_t mode)
             }
             break;
 
-        case EMP:
-            /* Do nothing */
-            break;
-
         default:
-            if (k & CONSUMER_KEY_FLAG) {
+            if (k == KEY_NONE) {
+                break;
+            } else if (k & CONSUMER_KEY_FLAG) {
                 hid_consumer_button(k, mode);
             } else if (k & MODIFIER_KEY_FLAG) {
                 hid_keyboard_modifier(k, mode);
@@ -148,7 +146,7 @@ void matrix_action(uint8_t row, uint8_t col, uint8_t mode)
     
     k = matrix_maps[keyboard_state.layer][addr];
     
-    if (k == EMP) {
+    if (k == KEY_NONE) {
         return;
     }
     
@@ -180,7 +178,7 @@ void non_matrix_action(uint8_t col, uint8_t mode)
     
     k = keys_maps[keyboard_state.layer][col];
     
-    if (k == EMP) {
+    if (k == KEY_NONE) {
         return;
     }
 

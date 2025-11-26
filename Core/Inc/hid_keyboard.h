@@ -7,6 +7,8 @@
 
 /* HID Keyboard key codes */
 
+#define KEY_NONE 0
+
 // Modifier keys
 #define KEY_LEFT_CTRL      (MODIFIER_KEY_FLAG | 0x01)
 #define KEY_LEFT_SHIFT     (MODIFIER_KEY_FLAG | 0x02)
