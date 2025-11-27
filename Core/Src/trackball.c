@@ -5,12 +5,11 @@
 #include "ratemeter.h"
 #include "glider.h"
 #include "math_utils.h"
+#include "config.h"
 #include "main.h"
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx.h"
 #include <math.h>
-
-#define WHEEL_DENOM 2
 
 typedef enum {
     AXIS_X,
@@ -20,6 +19,7 @@ typedef enum {
 
 static volatile int8_t distances[AXIS_NUM];
 static RateMeter rateMeter[AXIS_NUM];
+static RateMeter wheelRate[AXIS_NUM];
 static Glider glider[AXIS_NUM];
 static int8_t wheelBuffer;
 static int8_t hWheelBuffer;  // Horizontal wheel buffer
@@ -34,12 +34,28 @@ static float rateToVelocityCurve(float input)
     return powf(rate, TRACKBALL_ACCELERATION_EXPONENT) / TRACKBALL_ACCELERATION_DIVISOR;
 }
 
+static int8_t applyScrollAcceleration(int8_t steps, float rate, float exponent, float divisor)
+{
+    if (steps == 0) {
+        return 0;
+    }
+    if (divisor <= 0.0f) {
+        return steps;
+    }
+    const float factor = 1.0f + powf(rate, exponent) / divisor;
+    const float scaled = fabsf((float)steps) * factor;
+    const int8_t magnitude = clamp_int8((int32_t)roundf(scaled));
+    return (steps > 0) ? magnitude : (int8_t)(-magnitude);
+}
+
 // Interrupt handlers
 void trackball_interrupt_x_neg(void)
 {
     __disable_irq();
     distances[AXIS_X] -= 1;
-    if (!asWheel) {
+    if (asWheel) {
+        ratemeter_onInterrupt(&wheelRate[AXIS_X]);
+    } else {
         ratemeter_onInterrupt(&rateMeter[AXIS_X]);
         glider_setDirection(&glider[AXIS_X], -1);
         
@@ -60,7 +76,9 @@ void trackball_interrupt_x_pos(void)
 {
     __disable_irq();
     distances[AXIS_X] += 1;
-    if (!asWheel) {
+    if (asWheel) {
+        ratemeter_onInterrupt(&wheelRate[AXIS_X]);
+    } else {
         ratemeter_onInterrupt(&rateMeter[AXIS_X]);
         glider_setDirection(&glider[AXIS_X], 1);
         
@@ -81,7 +99,9 @@ void trackball_interrupt_y_neg(void)
 {
     __disable_irq();
     distances[AXIS_Y] -= 1;
-    if (!asWheel) {
+    if (asWheel) {
+        ratemeter_onInterrupt(&wheelRate[AXIS_Y]);
+    } else {
         ratemeter_onInterrupt(&rateMeter[AXIS_Y]);
         glider_setDirection(&glider[AXIS_Y], -1);
         
@@ -102,7 +122,9 @@ void trackball_interrupt_y_pos(void)
 {
     __disable_irq();
     distances[AXIS_Y] += 1;
-    if (!asWheel) {
+    if (asWheel) {
+        ratemeter_onInterrupt(&wheelRate[AXIS_Y]);
+    } else {
         ratemeter_onInterrupt(&rateMeter[AXIS_Y]);
         glider_setDirection(&glider[AXIS_Y], 1);
         
@@ -152,17 +174,32 @@ void trackball_task(void)
         if (asWheel) {
             ratemeter_expire(&rateMeter[AXIS_X]);
             ratemeter_expire(&rateMeter[AXIS_Y]);
+            ratemeter_init(&wheelRate[AXIS_X]);
+            ratemeter_init(&wheelRate[AXIS_Y]);
             wheelBuffer = 0;
             hWheelBuffer = 0;
+        } else {
+            ratemeter_expire(&wheelRate[AXIS_X]);
+            ratemeter_expire(&wheelRate[AXIS_Y]);
         }
         lastWheelMode = asWheel;
     }
     
     if (asWheel) {
+        ratemeter_tick(&wheelRate[AXIS_X], delta);
+        ratemeter_tick(&wheelRate[AXIS_Y], delta);
         // Vertical scroll (wheel) - Y axis
         wheelBuffer += distances[AXIS_Y];
-        w = wheelBuffer / WHEEL_DENOM;
-        wheelBuffer -= w * WHEEL_DENOM;
+        w = wheelBuffer / TRACKBALL_SCROLL_VERTICAL_DENOM;
+        wheelBuffer -= w * TRACKBALL_SCROLL_VERTICAL_DENOM;
+        if (w != 0) {
+            const float scrollRate = ratemeter_rate(&wheelRate[AXIS_Y]);
+            w = applyScrollAcceleration(
+                w,
+                scrollRate,
+                TRACKBALL_SCROLL_VERTICAL_EXPONENT,
+                TRACKBALL_SCROLL_VERTICAL_DIVISOR);
+        }
         
         // Horizontal scroll (pan) - X axis
         hWheelBuffer += distances[AXIS_X];
@@ -191,8 +228,16 @@ void trackball_task(void)
         // In wheel mode, use pan for horizontal scroll
         int8_t hw = 0;
         if (hWheelBuffer != 0) {
-            hw = hWheelBuffer / WHEEL_DENOM;
-            hWheelBuffer -= hw * WHEEL_DENOM;
+            hw = hWheelBuffer / TRACKBALL_SCROLL_HORIZONTAL_DENOM;
+            hWheelBuffer -= hw * TRACKBALL_SCROLL_HORIZONTAL_DENOM;
+            if (hw != 0) {
+                const float panRate = ratemeter_rate(&wheelRate[AXIS_X]);
+                hw = applyScrollAcceleration(
+                    hw,
+                    panRate,
+                    TRACKBALL_SCROLL_HORIZONTAL_EXPONENT,
+                    TRACKBALL_SCROLL_HORIZONTAL_DIVISOR);
+            }
         }
         if (w != 0 || hw != 0) {
             hid_mouse_move_with_pan(0, 0, -w, hw);  // Invert horizontal scroll direction
@@ -215,6 +260,8 @@ void trackball_init(void)
     // Hall sensors are already configured as EXTI in MX_GPIO_Init
     ratemeter_init(&rateMeter[AXIS_X]);
     ratemeter_init(&rateMeter[AXIS_Y]);
+    ratemeter_init(&wheelRate[AXIS_X]);
+    ratemeter_init(&wheelRate[AXIS_Y]);
     glider_init(&glider[AXIS_X]);
     glider_init(&glider[AXIS_Y]);
     
