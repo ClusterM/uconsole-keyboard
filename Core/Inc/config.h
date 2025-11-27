@@ -7,7 +7,7 @@
 static const uint16_t backlight_vals[3] = {0, 500, 2000};
 
 // The initial value of the keyboard backlight (index of the backlight_vals array)
-#define KEYBOARD_INITIAL_BACKLIGHT_VALUE_ID 0
+#define KEYBOARD_INITIAL_BACKLIGHT_VALUE_ID 1
 
 // The time of inactivity in seconds after which the keyboard backlight will turn off
 // 0 = never turn off

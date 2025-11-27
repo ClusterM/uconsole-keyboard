@@ -40,8 +40,8 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         KEY_DOWN_ARROW,         // Down
         KEY_LEFT_ARROW,         // Left
         KEY_RIGHT_ARROW,        // Right
-        KEY_LEFT_GUI,           // Gamepad A
-        KEY_KEYPAD_ASTERISK,    // Gamepad B
+        KEY_RETURN,             // Gamepad A
+        KEY_LEFT_GUI,           // Gamepad B
         MOUSE_RIGHT,            // Gamepad X
         MOUSE_LEFT,             // Gamepad Y
         KEY_LEFT_SHIFT,         // Left shift
