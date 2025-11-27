@@ -22,4 +22,8 @@ static const uint16_t backlight_vals[3] = {0, 500, 2000};
 // If defined, the keyboard backlight will resume when the trackball is moved
 #define KEYBOARD_BACKLIGHT_RESUME_BY_TRACKBALL
 
+// Trackball acceleration curve parameters
+#define TRACKBALL_ACCELERATION_EXPONENT 1.45f
+#define TRACKBALL_ACCELERATION_DIVISOR 100.0f
+
 #endif

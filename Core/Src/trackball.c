@@ -28,7 +28,10 @@ static bool lastWheelMode = false;
 
 static float rateToVelocityCurve(float input)
 {
-    return fabsf(input) / 30.0f;
+    float rate = fabsf(input);
+    // Power curve with exponent for smooth acceleration at all speeds
+    // More gradual than quadratic, works well for both slow and fast movements
+    return powf(rate, TRACKBALL_ACCELERATION_EXPONENT) / TRACKBALL_ACCELERATION_DIVISOR;
 }
 
 // Interrupt handlers
