@@ -116,6 +116,21 @@ static void do_the_key(uint16_t k, uint8_t mode)
                 // PWM will be set in main loop
             }
             break;
+        
+        case KEY_SEMICOLON:
+            if (mode == KEY_PRESSED) {
+                if (HAL_GetTick() - keyboard_state.last_pressed_time < 300) {
+                    hid_keyboard_button(KEY_BACKSPACE, KEY_PRESSED);
+                    hid_keyboard_button(KEY_BACKSPACE, KEY_RELEASED);
+                    hid_keyboard_button(KEY_APOSTROPHE, KEY_PRESSED);
+                    hid_keyboard_button(KEY_APOSTROPHE, KEY_RELEASED);
+                } else {
+                    hid_keyboard_button(k, mode);
+                }
+            } else {
+                hid_keyboard_button(k, mode);
+            }
+            break;
 
         default:
             if (k == KEY_NONE) {
