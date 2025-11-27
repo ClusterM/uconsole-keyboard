@@ -137,6 +137,7 @@ AS_INCLUDES =
 
 # C includes
 C_INCLUDES =  \
+-I. \
 -ICore/Inc \
 -IDrivers/STM32F1xx_HAL_Driver/Inc/Legacy \
 -IDrivers/STM32F1xx_HAL_Driver/Inc \
