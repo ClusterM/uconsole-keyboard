@@ -157,8 +157,6 @@ void matrix_task(void)
                     pressed = (matrix_row & col_mask);
                     if (pressed != 0) {
                         matrix_press(r, c);
-                        keyboard_state.last_pressed_key = c;
-                        keyboard_state.last_pressed_time = HAL_GetTick();
                     } else {
                         matrix_release(r, c);
                     }

@@ -74,8 +74,6 @@ void non_matrix_task(void)
                 pressed = keys & mask;
                 if (pressed) {
                     non_matrix_action(c, KEY_PRESSED);
-                    keyboard_state.last_pressed_key = c;
-                    keyboard_state.last_pressed_time = HAL_GetTick();
                 } else {
                     non_matrix_action(c, KEY_RELEASED);
                 }
