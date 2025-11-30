@@ -14,7 +14,7 @@ static const uint16_t backlight_vals[3] = {0, 500, 2000};
 #define KEYBOARD_BACKLIGHT_OFF_TIME 15
 
 // The duration of the keyboard backlight dim out effect in milliseconds
-#define KEYBOARD_BACKLIGHT_DIM_OUT_DURATION 5000
+#define KEYBOARD_BACKLIGHT_DIM_OUT_DURATION 10000
 
 // The value of the keyboard backlight when it is dimmed out
 #define KEYBOARD_BACKLIGHT_DIMMED_OUT_VALUE 0
