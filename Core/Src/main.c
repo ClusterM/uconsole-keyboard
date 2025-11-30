@@ -180,14 +180,21 @@ int main(void)
   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
   
   // Blink on startup
-  for (int i = 0; i < 2000; i += 100) {
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i);
-    HAL_Delay(25);
+  if (backlight_vals[KEYBOARD_INITIAL_BACKLIGHT_VALUE_ID] == 0) {
+    for (int i = 0; i < 2000; i += 100) {
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i);
+      HAL_Delay(25);
+    }
+    for (int i = 2000; i >= 0; i -= 100) {
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i);
+      HAL_Delay(50);
+    }
+  } else {
+    for (int i = 0; i < backlight_vals[KEYBOARD_INITIAL_BACKLIGHT_VALUE_ID]; i += 100) {
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i);
+      HAL_Delay(50);
+    }
   }
-  for (int i = 2000; i >= 0; i -= 100) {
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i);
-    HAL_Delay(25);
-  }  
   
   // Wait for USB connection
   HAL_Delay(1000);
