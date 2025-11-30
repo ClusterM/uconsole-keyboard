@@ -119,11 +119,62 @@ static void do_the_key(uint16_t k, uint8_t mode)
         
         case KEY_SEMICOLON:
             if (mode == KEY_PRESSED) {
-                if (HAL_GetTick() - keyboard_state.last_pressed_time < 300) {
+                // Double press feature
+                // ;; -> ' (жж -> э)
+                // :: -> " (ЖЖ -> Э)
+                if (HAL_GetTick() - keyboard_state.last_pressed_time < 300 && keyboard_state.last_pressed_key == KEY_SEMICOLON) {
+                    // Release the shift keys first if they are pressed
+                    if (keyboard_state.mod_keys_on & KEY_LEFT_SHIFT) {
+                        hid_keyboard_modifier(KEY_LEFT_SHIFT, KEY_RELEASED);
+                    }
+                    if (keyboard_state.mod_keys_on & KEY_RIGHT_SHIFT) {
+                        hid_keyboard_modifier(KEY_RIGHT_SHIFT, KEY_RELEASED);
+                    }
                     hid_keyboard_button(KEY_BACKSPACE, KEY_PRESSED);
                     hid_keyboard_button(KEY_BACKSPACE, KEY_RELEASED);
+                    // Press the shift keys again
+                    if (keyboard_state.mod_keys_on & KEY_LEFT_SHIFT) {
+                        hid_keyboard_modifier(KEY_LEFT_SHIFT, KEY_PRESSED);
+                    }
+                    if (keyboard_state.mod_keys_on & KEY_RIGHT_SHIFT) {
+                        hid_keyboard_modifier(KEY_RIGHT_SHIFT, KEY_PRESSED);
+                    }    
                     hid_keyboard_button(KEY_APOSTROPHE, KEY_PRESSED);
                     hid_keyboard_button(KEY_APOSTROPHE, KEY_RELEASED);
+                    keyboard_state.last_pressed_key = KEY_NONE;
+                } else {
+                    hid_keyboard_button(k, mode);
+                }
+            } else {
+                hid_keyboard_button(k, mode);
+            }
+            break;
+
+        case KEY_P:
+            if (mode == KEY_PRESSED) {
+                // Double press feature
+                // pp -> [ (з -> Х)
+                // PP -> { (З -> Х)
+                if (HAL_GetTick() - keyboard_state.last_pressed_time < 300 && keyboard_state.last_pressed_key == KEY_P) {
+                    // Release the shift keys first if they are pressed
+                    if (keyboard_state.mod_keys_on & KEY_LEFT_SHIFT) {
+                        hid_keyboard_modifier(KEY_LEFT_SHIFT, KEY_RELEASED);
+                    }
+                    if (keyboard_state.mod_keys_on & KEY_RIGHT_SHIFT) {
+                        hid_keyboard_modifier(KEY_RIGHT_SHIFT, KEY_RELEASED);
+                    }
+                    hid_keyboard_button(KEY_BACKSPACE, KEY_PRESSED);
+                    hid_keyboard_button(KEY_BACKSPACE, KEY_RELEASED);
+                    // Press the shift keys again
+                    if (keyboard_state.mod_keys_on & KEY_LEFT_SHIFT) {
+                        hid_keyboard_modifier(KEY_LEFT_SHIFT, KEY_PRESSED);
+                    }
+                    if (keyboard_state.mod_keys_on & KEY_RIGHT_SHIFT) {
+                        hid_keyboard_modifier(KEY_RIGHT_SHIFT, KEY_PRESSED);
+                    }    
+                    hid_keyboard_button(KEY_LEFT_BRACE, KEY_PRESSED);
+                    hid_keyboard_button(KEY_LEFT_BRACE, KEY_RELEASED);
+                    keyboard_state.last_pressed_key = KEY_NONE;
                 } else {
                     hid_keyboard_button(k, mode);
                 }
