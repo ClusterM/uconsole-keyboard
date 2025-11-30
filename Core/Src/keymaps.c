@@ -24,9 +24,9 @@ const uint16_t matrix_maps[][MATRIX_KEYS] = {
         KEY_PRNT_SCRN,         KEY_PAUSE,             CONSUMER_MUTE,            0,                      0,                 0,                 KEY_F11,          KEY_F12,
         KEY_F1,                KEY_F2,                KEY_F3,                   KEY_F4,                 KEY_F5,            KEY_F6,            KEY_F7,           KEY_F8,
         KEY_F9,                KEY_F10,               SK_KEYBOARD_LOCK,         KEY_CAPS_LOCK,          0,                 0,                 0,                0,
-        0,                     0,                     0,                        0,                      0,                 0,                 0,                0,
-        0,                     0,                     0,                        0,                      0,                 0,                 0,                0,
-        0,                     0,                     0,                        0,                      0,                 0,                 0,                0,
+        0,                     0,                     0,                        0,                      0,                 0,                 KEY_PAGE_UP,      KEY_INSERT,
+        0,                     0,                     0,                        0,                      0,                 0,                 0,                KEY_HOME,
+        KEY_END,               KEY_PAGE_DOWN,         0,                        0,                      0,                 0,                 0,                0,
         0,                     0,                     CONSUMER_BRIGHTNESS_DOWN, CONSUMER_BRIGHTNESS_UP, 0,                 0,                 0,                0,
         KEY_DELETE,            0,                     0,                        0,                      SK_KEYBOARD_LIGHT, 0,                 0,                0
     }
