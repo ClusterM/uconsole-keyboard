@@ -161,6 +161,8 @@ void matrix_action(uint8_t row, uint8_t col, uint8_t mode)
             matrix_pick_map[addr] = k;
         }
         do_the_key(k, KEY_PRESSED);
+        keyboard_state.last_pressed_key = k;
+        keyboard_state.last_pressed_time = HAL_GetTick();
     } else {
         if (matrix_pick_map[addr] == 0) {
             // No stored value, use provided HID code
@@ -196,6 +198,8 @@ void non_matrix_action(uint8_t col, uint8_t mode)
             non_matrix_pick_map[col] = k;
         }
         do_the_key(k, KEY_PRESSED);
+        keyboard_state.last_pressed_key = k;
+        keyboard_state.last_pressed_time = HAL_GetTick();
     } else {
         if (non_matrix_pick_map[col] == 0) {
             do_the_key(k, KEY_RELEASED);
