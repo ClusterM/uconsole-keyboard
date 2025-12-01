@@ -150,6 +150,7 @@ static void do_the_key(uint16_t k, uint8_t mode)
             }
             break;
 
+        /*
         case KEY_P:
             if (mode == KEY_PRESSED) {
                 // Double press feature
@@ -182,6 +183,7 @@ static void do_the_key(uint16_t k, uint8_t mode)
                 hid_keyboard_button(k, mode);
             }
             break;
+        */
 
         default:
             if (k == KEY_NONE) {
