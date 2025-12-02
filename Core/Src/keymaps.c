@@ -11,7 +11,7 @@ KEYBOARD_STATE keyboard_state;
 // Mappings for the keyboard matrix
 const uint16_t matrix_maps[][MATRIX_KEYS] = {
     [DEF_LAYER] = {
-        KEY_NONE,              KEY_NONE,              CONSUMER_VOLUME_DOWN,     KEY_GRAVE,              KEY_LEFT_BRACE,    KEY_RIGHT_BRACE,   KEY_MINUS,        KEY_EQUAL,
+        KEY_KEYPAD_MINUS,      KEY_KEYPAD_PLUS,       CONSUMER_VOLUME_DOWN,     KEY_GRAVE,              KEY_LEFT_BRACE,    KEY_RIGHT_BRACE,   KEY_MINUS,        KEY_EQUAL,
         KEY_1,                 KEY_2,                 KEY_3,                    KEY_4,                  KEY_5,             KEY_6,             KEY_7,            KEY_8,
         KEY_9,                 KEY_0,                 KEY_ESC,                  KEY_TAB,                KEY_NONE,          KEY_NONE,          KEY_NONE,         KEY_NONE,
         KEY_Q,                 KEY_W,                 KEY_E,                    KEY_R,                  KEY_T,             KEY_Y,             KEY_U,            KEY_I,
