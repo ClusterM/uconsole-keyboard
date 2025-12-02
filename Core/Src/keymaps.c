@@ -104,6 +104,7 @@ static void do_the_key(uint16_t k, uint8_t mode)
         case SK_KEYBOARD_LOCK:
             if (mode == KEY_PRESSED) {
                 keyboard_state.fn_lock = !keyboard_state.fn_lock;
+                leds_blink(keyboard_state.fn_lock + 1, LEDS_BLINK_PERIOD_SHORT);
             }
             break;
 
