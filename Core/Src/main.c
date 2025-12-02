@@ -168,7 +168,7 @@ int main(void)
   if (keyboard_state.backlight >= (sizeof(backlight_vals) / sizeof(backlight_vals[0]))) {
     keyboard_state.backlight = 0;
   }
-  keyboard_state.lock = 0;
+  keyboard_state.fn_lock = 0;
   
   // Initialize modules
   matrix_init();

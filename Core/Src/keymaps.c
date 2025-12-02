@@ -103,7 +103,7 @@ static void do_the_key(uint16_t k, uint8_t mode)
 
         case SK_KEYBOARD_LOCK:
             if (mode == KEY_PRESSED) {
-                keyboard_state.lock ^= 1;
+                keyboard_state.fn_lock = !keyboard_state.fn_lock;
             }
             break;
 
@@ -206,6 +206,27 @@ static void do_the_key(uint16_t k, uint8_t mode)
     }
 }
 
+static uint8_t is_f_key(uint16_t k)
+{
+    switch (k) {
+        case KEY_F1:
+        case KEY_F2:
+        case KEY_F3:
+        case KEY_F4:
+        case KEY_F5:
+        case KEY_F6:
+        case KEY_F7:
+        case KEY_F8:
+        case KEY_F9:
+        case KEY_F10:
+        case KEY_F11:
+        case KEY_F12:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
 void matrix_action(uint8_t row, uint8_t col, uint8_t mode)
 {
     uint16_t k;
@@ -216,11 +237,14 @@ void matrix_action(uint8_t row, uint8_t col, uint8_t mode)
         k = matrix_maps[DEF_LAYER][addr];
     }
 
-    if (k == KEY_NONE) {
-        return;
+    if ((is_f_key(matrix_maps[DEF_LAYER][addr]) || is_f_key(matrix_maps[FN_LAYER][addr])) && keyboard_state.fn_lock) {
+        uint8_t new_k = matrix_maps[keyboard_state.layer == DEF_LAYER ? FN_LAYER : DEF_LAYER][addr];
+        if (new_k != KEY_NONE) {
+            k = new_k;
+        }
     }
-    
-    if (k != SK_FN_KEY && k != SK_KEYBOARD_LOCK && keyboard_state.lock == 1) {
+
+    if (k == KEY_NONE) {
         return;
     }
     
@@ -252,15 +276,18 @@ void non_matrix_action(uint8_t col, uint8_t mode)
     if (!k) {
         k = keys_maps[DEF_LAYER][col];
     }
+
+    if ((is_f_key(keys_maps[DEF_LAYER][col]) || is_f_key(keys_maps[FN_LAYER][col])) && keyboard_state.fn_lock) {
+        uint8_t new_k = keys_maps[keyboard_state.layer == DEF_LAYER ? FN_LAYER : DEF_LAYER][col];
+        if (new_k != KEY_NONE) {
+            k = new_k;
+        }
+    }
     
     if (k == KEY_NONE) {
         return;
     }
 
-    if (k != SK_FN_KEY && k != SK_KEYBOARD_LOCK && keyboard_state.lock == 1) {
-        return;
-    }
-    
     if (mode == KEY_PRESSED) {
         if (non_matrix_pick_map[col] == 0) {
             non_matrix_pick_map[col] = k;

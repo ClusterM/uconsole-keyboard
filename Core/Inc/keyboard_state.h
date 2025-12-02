@@ -20,7 +20,7 @@ typedef struct {
     uint8_t layer;
     uint16_t mod_keys_on;
     uint8_t backlight;
-    uint8_t lock;
+    uint8_t fn_lock;
     uint16_t last_pressed_key;
     uint32_t last_pressed_time;
     uint32_t last_activity_time;
