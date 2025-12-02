@@ -126,6 +126,23 @@ static void USB_Reset_After_Bootloader(void)
   // On STM32F1, USB pins don't need explicit configuration, but we ensure clean state
   // The pins will be configured by USB peripheral when it's enabled
 }
+
+/**
+ * @brief Blink the keyboard LEDs a specified number of times with a defined interval.
+ *
+ * This function initiates a visual blinking effect for the keyboard LEDs. The "interval" parameter
+ * specifies the total duration of one blink cycle (LED ON time plus LED OFF time), measured in milliseconds.
+ * The LEDs will blink "count" times, with each blink consisting of the LED being on and off for the duration
+ * specified by "interval".
+ *
+ * @param count    Number of blink cycles (on + off) to perform.
+ * @param interval Total duration of each blink cycle in milliseconds (LED on time + pause time).
+ */
+void leds_blink(uint8_t count, uint16_t interval)
+{
+  keyboard_state.leds_timer = HAL_GetTick() + count * interval;
+  keyboard_state.leds_interfal = interval;
+}
 /* USER CODE END 0 */
 
 /**
@@ -169,6 +186,7 @@ int main(void)
     keyboard_state.backlight = 0;
   }
   keyboard_state.fn_lock = 0;
+  keyboard_state.leds_timer = 0;
   
   // Initialize modules
   matrix_init();
@@ -207,7 +225,14 @@ int main(void)
   {
     // Update backlight PWM
     uint32_t time = HAL_GetTick();
-    if (time - keyboard_state.last_activity_time < KEYBOARD_BACKLIGHT_OFF_TIME * 1000) {
+
+    if (keyboard_state.leds_timer > time && keyboard_state.leds_interfal > 0) {
+      // Blink the LEDs (keyboard backlight)
+      uint8_t v = ((keyboard_state.leds_timer - time) / (keyboard_state.leds_interfal / 2)) & 1;
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, !v * 0xFFFF);
+      HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, v ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    }
+    else if (time - keyboard_state.last_activity_time < KEYBOARD_BACKLIGHT_OFF_TIME * 1000) {
       // Normal backlight
       __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, backlight_vals[keyboard_state.backlight]);
     } else if (time - keyboard_state.last_activity_time >= KEYBOARD_BACKLIGHT_OFF_TIME * 1000 + KEYBOARD_BACKLIGHT_DIM_OUT_DURATION) {

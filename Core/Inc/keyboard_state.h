@@ -24,6 +24,8 @@ typedef struct {
     uint16_t last_pressed_key;
     uint32_t last_pressed_time;
     uint32_t last_activity_time;
+    uint32_t leds_timer;
+    uint16_t leds_interfal;
 } KEYBOARD_STATE;
 
 extern KEYBOARD_STATE keyboard_state;

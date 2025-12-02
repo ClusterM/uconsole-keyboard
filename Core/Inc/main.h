@@ -55,7 +55,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void leds_blink(uint8_t count, uint16_t interval);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -150,6 +150,8 @@ void Error_Handler(void);
 #define CONSUMER_KEY_FLAG 0x2000
 #define MOUSE_BUTTON_FLAG 0x4000
 #define SPECIAL_KEY_FLAG  0x8000
+
+#define LEDS_BLINK_PERIOD_SHORT 200
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
