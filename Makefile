@@ -45,6 +45,7 @@ Core/Src/keymaps.c \
 Core/Src/trackball.c \
 Core/Src/hid_keyboard.c \
 Core/Src/hid_mouse.c \
+Core/Src/hid_gamepad.c \
 Core/Src/hid_consumer.c \
 Core/Src/ratemeter.c \
 Core/Src/glider.c \

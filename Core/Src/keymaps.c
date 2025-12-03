@@ -3,6 +3,7 @@
 #include "hid_keyboard.h"
 #include "hid_mouse.h"
 #include "hid_consumer.h"
+#include "hid_gamepad.h"
 #include "main.h"
 #include "stm32f1xx_hal.h"
 
@@ -29,6 +30,16 @@ const uint16_t matrix_maps[][MATRIX_KEYS] = {
         KEY_END,               KEY_PAGE_DOWN,         0,                        0,                      0,                 0,                 0,                0,
         0,                     0,                     CONSUMER_BRIGHTNESS_DOWN, CONSUMER_BRIGHTNESS_UP, 0,                 0,                 0,                0,
         KEY_DELETE,            0,                     0,                        0,                      SK_KEYBOARD_LIGHT, 0,                 0,                0
+    },
+    [GAME_LAYER] = {
+        GAMEPAD_BUTTON_5,      GAMEPAD_BUTTON_6,      0,                        0,                      0,                 0,                 0,                0,
+        0,                     0,                     0,                        0,                      0,                 0,                 0,                0,
+        0,                     0,                     0,                        0,                      0,                 0,                 0,                0,
+        0,                     0,                     0,                        0,                      0,                 0,                 0,                0,
+        0,                     0,                     0,                        0,                      0,                 0,                 0,                0,
+        0,                     0,                     0,                        0,                      0,                 0,                 0,                0,
+        0,                     0,                     0,                        0,                      0,                 0,                 0,                0,
+        0,                     0,                     0,                        0,                      0,                 0,                 0,                0
     }
 };
 
@@ -71,6 +82,25 @@ const uint16_t keys_maps[][KEYS_NUM] = {
         0,                      // Gamepad L
         0,                      // Right alt
         0,                      // Gamepad R
+    },
+    [GAME_LAYER] = {
+        0,                      // Trackball button
+        GAMEPAD_UP,             // Up
+        GAMEPAD_DOWN,           // Down
+        GAMEPAD_LEFT,           // Left
+        GAMEPAD_RIGHT,          // Right
+        GAMEPAD_BUTTON_1,       // Gamepad A
+        GAMEPAD_BUTTON_2,       // Gamepad B
+        GAMEPAD_BUTTON_3,       // Gamepad X
+        GAMEPAD_BUTTON_4,       // Gamepad Y
+        0,                      // Left shift
+        0,                      // Right shift
+        0,                      // Left ctrl
+        0,                      // Right ctrl
+        0,                      // Left alt
+        0,                      // Gamepad L
+        0,                      // Right alt
+        0,                      // Gamepad R
     }
 };
 
@@ -81,6 +111,12 @@ static void do_the_key(uint16_t k, uint8_t mode)
 {
     switch (k) {
         case SK_FN_KEY:
+            //if (mode == KEY_PRESSED && HAL_GetTick() - keyboard_state.last_pressed_time < 300 && keyboard_state.last_pressed_key == SK_FN_KEY)
+            if (mode == KEY_PRESSED && keyboard_state.layer == FN_LAYER) // Fn+Fn = Game mode
+            {
+                keyboard_state.game_mode = !keyboard_state.game_mode;
+                leds_blink(keyboard_state.game_mode + 1, LEDS_BLINK_PERIOD_LONG);
+            }
             keyboard_state.layer = mode == KEY_PRESSED ? FN_LAYER : DEF_LAYER;
             break;
 
@@ -200,6 +236,8 @@ static void do_the_key(uint16_t k, uint8_t mode)
                 }                
             } else if (k & MOUSE_BUTTON_FLAG) {
                 hid_mouse_button(k, mode);
+            } else if (k & GAMEPAD_BUTTON_FLAG) {
+                hid_gamepad_button(k, mode);
             } else if (k < 0x100) {
                 hid_keyboard_button(k, mode);
             }
@@ -233,9 +271,14 @@ void matrix_action(uint8_t row, uint8_t col, uint8_t mode)
     uint16_t k;
     uint8_t addr = row * MATRIX_COLS + col;
 
-    k = matrix_maps[keyboard_state.layer][addr];
-    if (!k) {
-        k = matrix_maps[DEF_LAYER][addr];
+    if (keyboard_state.game_mode && keyboard_state.layer == DEF_LAYER && matrix_maps[GAME_LAYER][addr]) {
+        // Game mode is active and the key is in the game layer
+        k = matrix_maps[GAME_LAYER][addr];
+    } else {
+        k = matrix_maps[keyboard_state.layer][addr];
+        if (!k) {
+            k = matrix_maps[DEF_LAYER][addr];
+        }
     }
 
     if ((is_f_key(matrix_maps[DEF_LAYER][addr]) || is_f_key(matrix_maps[FN_LAYER][addr])) && keyboard_state.fn_lock) {
@@ -272,10 +315,15 @@ void matrix_action(uint8_t row, uint8_t col, uint8_t mode)
 void non_matrix_action(uint8_t col, uint8_t mode)
 {
     uint16_t k;
-    
-    k = keys_maps[keyboard_state.layer][col];
-    if (!k) {
-        k = keys_maps[DEF_LAYER][col];
+
+    if (keyboard_state.game_mode && keyboard_state.layer == DEF_LAYER && keys_maps[GAME_LAYER][col]) {
+        // Game mode is active and the key is in the game layer
+        k = keys_maps[GAME_LAYER][col];
+    } else {
+        k = keys_maps[keyboard_state.layer][col];
+        if (!k) {
+            k = keys_maps[DEF_LAYER][col];
+        }
     }
 
     if ((is_f_key(keys_maps[DEF_LAYER][col]) || is_f_key(keys_maps[FN_LAYER][col])) && keyboard_state.fn_lock) {

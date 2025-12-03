@@ -31,7 +31,13 @@ static float rateToVelocityCurve(float input)
     float rate = fabsf(input);
     // Power curve with exponent for smooth acceleration at all speeds
     // More gradual than quadratic, works well for both slow and fast movements
-    return powf(rate, TRACKBALL_ACCELERATION_EXPONENT) / TRACKBALL_ACCELERATION_DIVISOR;
+    if (!keyboard_state.game_mode) {
+        // Normal acceleration curve
+        return powf(rate, TRACKBALL_ACCELERATION_EXPONENT) / TRACKBALL_ACCELERATION_DIVISOR;
+    } else {
+        // Game mode acceleration curve
+        return powf(rate, TRACKBALL_GAME_ACCELERATION_EXPONENT) / TRACKBALL_GAME_ACCELERATION_DIVISOR;
+    }
 }
 
 static int8_t applyScrollAcceleration(int8_t steps, float rate, float exponent, float divisor)
