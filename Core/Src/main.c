@@ -143,6 +143,20 @@ void leds_blink(uint8_t count, uint16_t interval)
   keyboard_state.leds_timer = HAL_GetTick() + count * interval;
   keyboard_state.leds_interfal = interval;
 }
+
+
+/**
+* @brief  Reset to bootloader via watchdog
+* @retval None (never returns)
+*/
+void jump_to_bootloader(void)
+{
+    IWDG->KR = 0x5555;
+    IWDG->PR = 0;
+    IWDG->RLR = 1;
+    IWDG->KR = 0xCCCC;
+    while (1);  
+}
 /* USER CODE END 0 */
 
 /**

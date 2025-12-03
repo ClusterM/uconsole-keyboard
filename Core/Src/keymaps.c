@@ -248,6 +248,11 @@ void non_matrix_action(uint8_t col, uint8_t mode)
 {
     uint16_t k;
 
+    /* Emergency recovery mode */
+    if (col == 0 /* Trackball button */ && mode == KEY_PRESSED && (keyboard_state.mod_keys_on & KEY_LEFT_CTRL) && (keyboard_state.mod_keys_on & KEY_RIGHT_CTRL)) {
+        jump_to_bootloader();
+    }    
+
     if (keyboard_state.game_mode && keyboard_state.layer == DEF_LAYER && keys_maps[GAME_LAYER][col]) {
         // Game mode is active and the key is in the game layer
         k = keys_maps[GAME_LAYER][col];
