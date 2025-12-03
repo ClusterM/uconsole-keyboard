@@ -186,6 +186,7 @@ int main(void)
     keyboard_state.backlight = 0;
   }
   keyboard_state.fn_lock = 0;
+  keyboard_state.game_mode = 0;
   keyboard_state.leds_timer = 0;
   
   // Initialize modules

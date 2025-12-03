@@ -149,9 +149,11 @@ void leds_blink(uint8_t count, uint16_t interval);
 #define MODIFIER_KEY_FLAG 0x1000
 #define CONSUMER_KEY_FLAG 0x2000
 #define MOUSE_BUTTON_FLAG 0x4000
+#define GAMEPAD_BUTTON_FLAG 0x0800
 #define SPECIAL_KEY_FLAG  0x8000
 
 #define LEDS_BLINK_PERIOD_SHORT 200
+#define LEDS_BLINK_PERIOD_LONG 500
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

@@ -17,6 +17,7 @@ enum SKEYS {
 
 #define DEF_LAYER 0x00
 #define FN_LAYER 0x01
+#define GAME_LAYER 0x02
 
 extern const uint16_t matrix_maps[][MATRIX_KEYS];
 extern const uint16_t keys_maps[][KEYS_NUM];

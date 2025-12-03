@@ -21,6 +21,7 @@ typedef struct {
     uint16_t mod_keys_on;
     uint8_t backlight;
     uint8_t fn_lock;
+    uint8_t game_mode;
     uint16_t last_pressed_key;
     uint32_t last_pressed_time;
     uint32_t last_activity_time;
