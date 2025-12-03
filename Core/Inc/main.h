@@ -56,6 +56,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 void leds_blink(uint8_t count, uint16_t interval);
+void jump_to_bootloader(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
