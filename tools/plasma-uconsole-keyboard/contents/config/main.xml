@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
+  <kcfgfile name=""/>
+  <group name="General">
+    <entry name="scriptsPath" type="String">
+      <label>Scripts directory</label>
+      <whatsthis>Directory containing keyboard_state.sh and hidraw_listener.sh (leave empty to use parent of plasmoid folder).</whatsthis>
+      <default></default>
+    </entry>
+  </group>
+</kcfg>

@@ -1,0 +1,17 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "uConsole Keyboard"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "Show and switch uConsole keyboard layer and FN lock (via hidraw).",
+        "Icon": "input-keyboard",
+        "Id": "org.kde.plasma.uconsole-keyboard",
+        "Name": "uConsole Keyboard Layer",
+        "Version": "1.0",
+        "Website": "https://github.com/clockworkpi/uconsole_keyboard"
+    },
+    "KPackageStructure": "Plasma/Applet"
+}

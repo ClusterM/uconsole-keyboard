@@ -1,0 +1,3 @@
+# uConsole keyboard (VID 1eaf, PID 0024): allow access to hidraw for layer/FN state
+# Add your user to group 'plugdev' (or create group 'uconsole' and use that).
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1eaf", ATTRS{idProduct}=="0024", MODE="0660", GROUP="plugdev"
